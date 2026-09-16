@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="zh-HK">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>planto2sw — Planto 記錄 → 碌邊張轉移碼（非官方）</title>
+<style>
+:root{
+  --paper:#F6F7F4; --ink:#1B2430; --ink-2:#4A5563; --line:#D9DDD6; --line-2:#EDEFEA;
+  --accent:#1F6F78; --accent-2:#E4F0F1; --warn:#B8681A; --warn-2:#FBF0E2; --ok:#2F7A4C; --ok-2:#E6F2EA; --bad:#A83A32;
+  --mono:"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,"PingFang HK","Noto Sans HK","Microsoft JhengHei",Segoe UI,Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+body{margin:0}
+a{color:var(--accent)}
+header{padding:28px 24px 18px;border-bottom:1px solid var(--line)}
+header h1{margin:0;font-size:22px;font-weight:650;letter-spacing:-.01em}
+header p{margin:6px 0 0;color:var(--ink-2);max-width:62ch}
+main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:0}
+.flow{padding:8px 24px 64px;max-width:900px}
+.rail{border-left:1px solid var(--line);padding:18px 20px;position:sticky;top:0;height:100vh;overflow:auto;background:#F1F3EF}
+@media (max-width:980px){main{grid-template-columns:1fr}.rail{position:static;height:auto;border-left:0;border-top:1px solid var(--line)}}
+section.step{padding:26px 0;border-bottom:1px solid var(--line)}
+section.step:last-child{border-bottom:0}
+.step h2{margin:0 0 4px;font-size:17px;font-weight:650;display:flex;gap:10px;align-items:baseline}
+.step h2 .n{font-family:var(--mono);font-size:13px;color:var(--ink-2);font-weight:500}
+.step .hint{color:var(--ink-2);margin:0 0 14px;max-width:70ch}
+.field{margin:10px 0}
+label.lbl{display:block;font-size:13px;color:var(--ink-2);margin-bottom:4px}
+textarea,input[type=text],input[type=number],select{font:inherit;color:inherit;background:#fff;border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%}
+textarea{font-family:var(--mono);font-size:12px;min-height:88px;resize:vertical}
+input[type=number]{width:96px;font-family:var(--mono)}
+select{width:auto;max-width:100%}
+button{font:inherit;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;padding:8px 14px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.note{font-size:13px;color:var(--ink-2)}
+.tag{display:inline-block;font-size:12px;padding:1px 7px;border-radius:4px;background:var(--line-2);color:var(--ink-2);font-family:var(--mono)}
+.tag.warn{background:var(--warn-2);color:var(--warn)}
+.tag.ok{background:var(--ok-2);color:var(--ok)}
+.tag.bad{background:#F6E4E2;color:var(--bad)}
+.msg{padding:10px 12px;border-radius:6px;margin:10px 0;font-size:14px}
+#s0.drop{outline:2px dashed #4e9a51;outline-offset:6px;border-radius:8px}
+.msg.warn{background:var(--warn-2);color:#7A4408}
+.msg.ok{background:var(--ok-2);color:#1F5A36}
+.msg.bad{background:#F6E4E2;color:#7A2820}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line-2);vertical-align:top}
+th{color:var(--ink-2);font-weight:600;white-space:nowrap}
+td.num,th.num{text-align:right;font-family:var(--mono);white-space:nowrap}
+tr.excluded td{color:#8a929c}
+.toggles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 16px}
+.toggle{display:flex;gap:8px;align-items:flex-start;padding:6px 0}
+.toggle input{margin-top:5px}
+.toggle small{display:block;color:var(--ink-2)}
+.vs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:560px}
+.vs .c{border:1px solid var(--line);border-radius:6px;padding:8px;background:#fff;text-align:center}
+.vs .c small{display:block;color:var(--ink-2);font-size:12px}
+.vs input{width:100%;text-align:center;margin-top:6px}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px 20px}
+.ledger h3{margin:0 0 8px;font-size:14px;font-weight:650}
+.ledger table{font-size:12.5px}
+.ledger td.num{font-variant-numeric:tabular-nums}
+.ledger .total td{border-top:1px solid var(--line);font-weight:600}
+.out textarea{min-height:120px}
+.scroll{overflow:auto;max-height:520px;border:1px solid var(--line);border-radius:6px;background:#fff}
+.small{font-size:12px}
+kbd{font-family:var(--mono);font-size:12px;background:var(--line-2);padding:0 5px;border-radius:3px}
+.disclaimer{margin:12px 0 0;padding:8px 11px;border-radius:6px;background:var(--warn-2);color:#7A4408;font-size:13px;max-width:70ch}
+.disclaimer .en{display:block;margin-top:2px;color:#8A6520}
+footer{border-top:1px solid var(--line);padding:18px 24px 30px;color:var(--ink-2);font-size:13px;background:#F1F3EF}
+footer p{margin:0 0 6px;max-width:80ch}
+footer p:last-child{margin-bottom:0}
+</style>
+</head>
+<body>
+<header>
+  <h1>Planto 記錄 → 碌邊張轉移碼（非官方）</h1>
+  <p>喺瀏覽器本機處理，唔會上傳任何嘢。先攞碌邊張規則庫，設定優惠登記，再匯入 Planto 嘅交易 CSV，最後出一條可以貼入碌邊張「匯入資料」嘅轉移碼。</p>
+  <p class="disclaimer">非官方工具，同 Planto 及碌邊張都冇任何關聯，亦唔係由佢哋提供支援。<span class="en">Unofficial tool. Not affiliated with, endorsed by, or supported by Planto or SwipeWhich.</span></p>
+</header>
+<main>
+<div class="flow">
+
+<section class="step" id="s0">
+  <h2><span class="n">前置</span>碌邊張規則庫（app-data.json）</h2>
+  <p class="hint">基本費率、商戶優惠同簽滿賞活動全部喺碌邊張嘅 <kbd>app-data.json</kbd> 入面。呢個工具<strong>唔會內置快照，亦唔會自動下載</strong>（淨係你撳「一鍵攞最新」嗰陣先會去攞）：碌邊張會定期修訂呢啲資料，內置嘅一舊咗就會顯示錯嘅數字。請你自己攞一份最新嘅，再喺下面揀入嚟；個檔淨係喺你部機度讀，唔會上傳。</p>
+  <p class="hint">喺新分頁打開 <a id="appdataLink" href="https://www.swipewhich.com/app-data.json" target="_blank" rel="noopener">https://www.swipewhich.com/app-data.json</a>，<kbd>右鍵</kbd> → 「另存為…」存成 <kbd>app-data.json</kbd>，再喺下面揀返個檔。揀完會記喺呢個瀏覽器，下次唔使再揀。</p>
+  <p class="hint">最快係撳一下下面嘅<strong>「一鍵攞最新」</strong>，直接由碌邊張攞當日最新嗰份。如果撳唔到（冇網、或者伺服器暫時用唔到），下面三個方法照用：<strong>①</strong> 喺嗰版撳 <kbd>Ctrl</kbd>+<kbd>A</kbd> 再 <kbd>Ctrl</kbd>+<kbd>C</kbd>，貼落下面個框（貼完即刻生效，唔使再撳掣）；<strong>②</strong> 將個 <kbd>.json</kbd> 檔拖入呢一格；<strong>③</strong> 下面揀檔案。</p>
+  <div class="field"><textarea id="appdataPaste" placeholder="喺 app-data.json 嗰版全選複製，貼落呢度" rows="2"></textarea></div>
+  <div class="row"><button class="primary" id="appdataFetch">一鍵攞最新</button><input type="file" id="appdataFile" accept=".json,application/json"><button id="appdataClear">清除</button></div>
+  <div id="appdataStatus" class="msg" style="display:none"></div>
+</section>
+
+<section class="step" id="s1">
+  <h2><span class="n">1</span>現有碌邊張資料</h2>
+  <p class="hint">碌邊張 → 設定 → 匯出備份 → 複製轉移碼，貼喺下面。冇嘅話可以跳過，會由空白開始。匯入係整份覆蓋，所以呢步嘅資料要係最新。</p>
+  <div class="field"><textarea id="existing" placeholder="SW1.eyJ2IjoxLCJhcHAiOiJzd2lwZXdoaWNoIi…（或者揀備份 .json 檔）"></textarea></div>
+  <div class="row"><input type="file" id="existingFile" accept=".json,.txt,application/json,text/plain"><button id="parseExisting">讀取</button><span id="existingSummary" class="note"></span></div>
+</section>
+
+<section class="step" id="s2">
+  <h2><span class="n">2</span>優惠設定</h2>
+  <p class="hint">Planto 冇呢啲資料，要你自己填。呢度嘅值會直接寫入轉移碼，蓋過第 1 步快照入面嘅值。第 3 步嘅費率表會按呢度嘅設定即時重算。點解要喺呢度計：碌邊張匯入時會將每筆記賬原封不動咁存低，之後唔會再幫你重新分類、亦唔會重算回贈（除非你喺 app 逐筆打開再撳儲存），所以工具一定要喺匯入之前自己分類、自己計好回贈。計法係工具自帶嘅引擎，<strong>凍結喺碌邊張 app 2.0.4（2026-09-11）</strong>，之後唔再跟住更新，所以可能同 app 有出入，<strong>一切以碌邊張 app 為準</strong>。</p>
+  <div class="toggles" id="regs"></div>
+  <div class="field" style="margin-top:14px"><label class="lbl">HSBC 最紅自主 — 5 個類別點分（每格填 0–5，合共上限 5）<span id="vsSum" class="tag"></span></label>
+    <div class="vs" id="vs"></div></div>
+  <div class="opts" id="opts" style="margin-top:14px"></div>
+  <div class="field" style="margin-top:14px"><label class="small"><input type="checkbox" id="guruTopCard"> Travel Guru 每個自然月只計外幣簽賬最高嗰張 HSBC 卡。呢個讀法 2026-09-12 已證實係錯嘅（條款 9c 明文將所有合資格卡嘅簽賬合併計算），所以預設唔剔；剔返只係用嚟重現舊算法。呢個係工具算法開關，唔會寫入碌邊張。</label></div>
+  <div class="field" style="margin-top:14px"><label class="lbl">逐個優惠登記／退出（碌邊張排行榜同卡片頁嘅 promoRegs，來自規則庫；未剔 = 退出）</label><div class="toggles" id="promoRegs"><span class="note">載入規則庫後顯示</span></div></div>
+  <div class="field"><label class="lbl">簽滿賞登記（milestoneEnroll，如卓越理財簽賬獎賞、Mox 夏日賞）</label><div class="toggles" id="milestones"></div></div>
+</section>
+
+<section class="step" id="s3">
+  <h2><span class="n">3</span>Planto 交易記錄</h2>
+  <p class="hint">Planto → 設定 → 匯出資料，電郵入面嘅 <kbd>transaction_export_….csv</kbd>。</p>
+  <div class="row"><input type="file" id="csvFile" accept=".csv,text/csv"><span id="csvSummary" class="note"></span></div>
+  <div id="cardMapWrap" style="display:none">
+    <h3 style="font-size:14px;margin:18px 0 6px">卡片對應</h3>
+    <p class="note" style="margin:0 0 8px">Planto 賬戶 → 碌邊張卡片。揀「不匯入」嘅賬戶會略過（存款、證券戶口）。</p>
+    <table id="cardMap"><thead><tr><th>Planto 賬戶</th><th class="num">交易數</th><th>碌邊張卡片</th></tr></thead><tbody></tbody></table>
+    <h3 style="font-size:14px;margin:18px 0 6px">自訂商戶規則</h3>
+    <p class="note" style="margin:0 0 8px">每行一條：<kbd>正則 =&gt; 場景</kbd>，例如 <kbd>netflix|spotify =&gt; onlineFX</kbd>。比內置規則優先；只存喺呢個瀏覽器，唔會寫入轉移碼。</p>
+    <textarea id="customRules" placeholder="netflix|spotify => onlineFX" style="min-height:64px"></textarea>
+    <div id="customRulesMsg" class="note"></div>
+    <h3 style="font-size:14px;margin:18px 0 6px">費率表（每卡 × 場景）</h3>
+    <div class="msg warn" style="margin:0 0 8px">⚠ 呢度嘅費率由一個<strong>已凍結</strong>嘅引擎計出嚟：佢喺 2026-09-11 對住碌邊張 app 2.0.4 逐組合核對過（209,664 組零差異），之後刻意唔再跟住更新。基本費率同商戶優惠照用你載入嘅 app-data.json，但逐張卡嘅特殊規則、Travel Guru 年度 RC 上限、EveryMile 季度分級呢啲計法停喺嗰日。<strong>逐張卡嘅簽賬上限（例如 Pulse 內地嘅半年上限）同爆頂之後嘅降率完全冇計</strong>，所以超過上限嗰部分嘅回贈會計多咗。碌邊張之後改過計法嘅話，呢度會同 app 有出入，<strong>一切以碌邊張 app 顯示嘅為準</strong>。</div>
+    <p class="note" style="margin:0 0 8px">碌邊張儲賬時會將回贈率寫死，之後唔會重算，所以要喺呢度俾啱嘅有效率。來源優先次序：通道規則（例如 Pulse 內地經微信／支付寶冇 +2%）→ 你喺呢度改嘅值 → 引擎。你快照入面手動記過嘅費率唔會用嚟計，淨係同引擎唔一致嗰陣提你檢查第 2 步設定。</p>
+    <table id="rates"><thead><tr><th>卡片</th><th>場景</th><th class="num">筆數</th><th class="num">簽賬 HK$</th><th>有效率</th><th>來源</th></tr></thead><tbody></tbody></table>
+  </div>
+</section>
+
+<section class="step" id="s4">
+  <h2><span class="n">4</span>逐筆檢查</h2>
+  <p class="hint">場景可以逐筆改。灰色行係唔會匯入嘅（還款、利息、退款配對、冇對應卡）。</p>
+  <div class="row" style="margin-bottom:8px"><label class="small"><input type="checkbox" id="showExcluded"> 顯示略過嘅行</label><label class="small"><input type="checkbox" id="onlyNew"> 只顯示碌邊張未有嘅新行</label><span id="reviewSummary" class="note"></span></div>
+  <div class="scroll"><table id="review"><thead><tr><th>日期</th><th>卡片</th><th>描述</th><th class="num">原幣</th><th class="num">HK$</th><th>場景</th><th>判斷</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section class="step out" id="s5">
+  <h2><span class="n">5</span>生成轉移碼</h2>
+  <p class="hint">碌邊張 → 設定 → 匯入資料 → 貼上轉移碼。或者下載 .json 用「由檔案匯入」。重複匯入唔會出重複記賬（id 係由交易內容算出嚟嘅）。</p>
+  <div class="msg warn">⚠ 匯入係整份覆蓋碌邊張而家嘅資料；開咗雲端同步嘅話會一齊推上雲端，蓋過其他裝置未同步嘅改動。回贈一經匯入唔會再重算。匯入之前，先喺碌邊張匯出一份最新備份。</div>
+  <div class="row" style="margin-bottom:8px"><label class="small"><input type="checkbox" id="refreshRates"> 已存在嘅記賬（同一筆、場景未變）都用而家嘅費率重寫 rate／rebate（碌邊張儲賬後唔會自己重算，設定改咗就要勾）</label></div>
+  <div class="row"><button class="primary" id="generate" disabled>生成轉移碼</button><button id="copyCode" disabled>複製</button><button id="dlJson" disabled>下載 backup .json</button><button id="dlReview" disabled>下載檢查表 .csv</button></div>
+  <div id="genMsg"></div>
+  <div class="field"><textarea id="code" readonly placeholder="按「生成轉移碼」"></textarea></div>
+</section>
+
+</div>
+<aside class="rail ledger">
+  <h3>賬本（即時）</h3>
+  <p class="note" id="ledgerHint">匯入 CSV 後喺度顯示每卡每場景嘅合資格簽賬同回贈。</p>
+  <table id="ledger"><tbody></tbody></table>
+  <h3 style="margin-top:18px">生效嘅優惠設定</h3>
+  <div id="effSettings" class="small note"></div>
+</aside>
+</main>
+
+<footer>
+  <p><strong>非官方工具，同 Planto 及碌邊張都冇任何關聯，亦唔係由佢哋提供支援。</strong>「Planto」同「碌邊張／SwipeWhich」係各自擁有者嘅商標，喺呢度淨係用嚟指出資料嘅來源同去處。</p>
+  <p><strong>Unofficial tool. Not affiliated with, endorsed by, or supported by Planto or SwipeWhich.</strong> Product names are used only to identify where the data comes from and where it goes.</p>
+  <p>基本費率同商戶優惠嚟自你自己提供嘅 app-data.json；計法寫死喺工具自帶嘅引擎，凍結喺碌邊張 app 2.0.4（2026-09-11）。一切以碌邊張 app 入面顯示嘅為準。</p>
+</footer>
+
+<script>
+// ---------------------------------------------------------------- constants
+// ====================================================================================================
+// BEGIN SwipeWhich-derived data (card list and scenario ids)
+// Everything from here down to the matching END marker is derived from SwipeWhich's front-end and is
+// NOT covered by this repository's MIT license. See LICENSE.
+// ====================================================================================================
+const CARDS = [{"id":"aeon_premium","name":"AEON Premium（黑卡）","issuer":"AEON","type":"cashback","net":"銀聯"},{"id":"aeon_purple_jcb","name":"AEON Purple（JCB）","issuer":"AEON","type":"cashback","net":"JCB"},{"id":"aeon_purple_vs","name":"AEON Purple（Visa）","issuer":"AEON","type":"both","net":"Visa"},{"id":"aeon_purple_mc","name":"AEON Purple（萬事達）","issuer":"AEON","type":"both","net":"Mastercard"},{"id":"aeon_purple_up","name":"AEON Purple（銀聯）","issuer":"AEON","type":"both","net":"銀聯"},{"id":"aeon_waku","name":"AEON WAKUWAKU","issuer":"AEON","type":"cashback","net":"Mastercard"},{"id":"aeon_basic","name":"AEON 信用卡","issuer":"AEON","type":"cashback","net":"Visa / MC / 銀聯 / JCB"},{"id":"ae_blue","name":"AE Blue Cash","issuer":"American Express","type":"cashback","net":"Amex"},{"id":"ae_explorer","name":"AE Explorer","issuer":"American Express","type":"miles","net":"Amex"},{"id":"ae_plat_cc","name":"AE 白金信用卡","issuer":"American Express","type":"miles","net":"Amex"},{"id":"ae_plat_charge","name":"AE 白金卡（鋼卡/細頭）","issuer":"American Express","type":"miles","net":"Amex"},{"id":"bea_goal","name":"BEA GOAL","issuer":"BEA","type":"cashback","net":"Mastercard"},{"id":"bea_jcb","name":"BEA JCB 白金卡","issuer":"BEA","type":"cashback","net":"JCB"},{"id":"bea_sup","name":"BEA SupremeGold","issuer":"BEA","type":"both","net":"Mastercard"},{"id":"bea_vs","name":"BEA Visa Signature","issuer":"BEA","type":"cashback","net":"Visa"},{"id":"bea_world","name":"BEA World MC","issuer":"BEA","type":"both","net":"Mastercard"},{"id":"bea_ititan","name":"BEA i-Titanium","issuer":"BEA","type":"cashback","net":"Mastercard"},{"id":"bea_uni","name":"BEA 大學/大專卡","issuer":"BEA","type":"cashback","net":"Visa / Mastercard"},{"id":"bea_diamond","name":"BEA 銀聯雙幣鑽石","issuer":"BEA","type":"cashback","net":"銀聯"},{"id":"boc_bliss","name":"中銀 Bliss Card","issuer":"Bank of China","type":"both","net":"Visa Infinite"},{"id":"boc_cheers","name":"中銀 Cheers VI","issuer":"Bank of China","type":"both","net":"Visa"},{"id":"boc_cheers_vs","name":"中銀 Cheers VS","issuer":"Bank of China","type":"both","net":"Visa"},{"id":"boc_chill_plat","name":"中銀 Chill Platinum","issuer":"Bank of China","type":"cashback","net":"Mastercard"},{"id":"boc_chill","name":"中銀 Chill World","issuer":"Bank of China","type":"cashback","net":"Mastercard"},{"id":"boc_go","name":"中銀 Go 卡","issuer":"Bank of China","type":"cashback","net":"銀聯"},{"id":"boc_sogo","name":"中銀 SOGO Visa Sig","issuer":"Bank of China","type":"cashback","net":"Visa"},{"id":"boc_uni","name":"中銀大學信用卡","issuer":"Bank of China","type":"cashback","net":"Visa / 銀聯"},{"id":"boc_gbayouth","name":"中銀大灣區青年卡","issuer":"Bank of China","type":"cashback","net":"銀聯"},{"id":"boc_taobao","name":"中銀淘寶卡","issuer":"Bank of China","type":"cashback","net":"Mastercard"},{"id":"bocom_gogoal","name":"交通銀行 Go-Goal","issuer":"BoCom","type":"cashback","net":"Visa"},{"id":"ccb_travo","name":"建行 TRAVO MC","issuer":"CCB Asia","type":"both","net":"Mastercard"},{"id":"ccb_eye","name":"建行 eye Visa Sig","issuer":"CCB Asia","type":"both","net":"Visa"},{"id":"cncbi_motion","name":"信銀國際 Motion","issuer":"CNCBI","type":"cashback","net":"Mastercard"},{"id":"cncbi_jd","name":"信銀國際 京東","issuer":"CNCBI","type":"cashback","net":"Mastercard"},{"id":"cncbi_gba","name":"信銀國際大灣區卡","issuer":"CNCBI","type":"cashback","net":"銀聯"},{"id":"citi_cashback","name":"Citi Cash Back","issuer":"Citibank","type":"cashback","net":"Visa / Mastercard"},{"id":"citi_hktv","name":"Citi HKTVMALL","issuer":"Citibank","type":"cashback","net":"Visa"},{"id":"citi_octopus","name":"Citi Octopus","issuer":"Citibank","type":"cashback","net":"Visa"},{"id":"citi_plus","name":"Citi Plus 信用卡","issuer":"Citibank","type":"both","net":null},{"id":"citi_pm","name":"Citi PremierMiles","issuer":"Citibank","type":"miles","net":"Mastercard"},{"id":"citi_prestige","name":"Citi Prestige","issuer":"Citibank","type":"miles","net":"Mastercard"},{"id":"citi_rewards_m","name":"Citi Rewards","issuer":"Citibank","type":"both","net":"Mastercard"},{"id":"citi_club","name":"Citi The Club","issuer":"Citibank","type":"cashback","net":"Mastercard"},{"id":"citi_ultima","name":"Citi ULTIMA","issuer":"Citibank","type":"miles","net":"Mastercard"},{"id":"dbs_black","name":"DBS Black World MC","issuer":"DBS","type":"miles","net":"Mastercard"},{"id":"dbs_compass","name":"DBS Compass Visa","issuer":"DBS","type":"cashback","net":"Visa"},{"id":"dbs_eminent_vs","name":"DBS Eminent VS","issuer":"DBS","type":"cashback","net":"Visa"},{"id":"dbs_eminent_plat","name":"DBS Eminent 白金","issuer":"DBS","type":"cashback","net":"Visa"},{"id":"dbs_live","name":"DBS Live Fresh","issuer":"DBS","type":"cashback","net":"Mastercard"},{"id":"ds_ana","name":"大新 ANA World MC","issuer":"Dah Sing","type":"miles","net":"Mastercard"},{"id":"ds_kitty","name":"大新 Hello Kitty 白金卡","issuer":"Dah Sing","type":"cashback","net":"Visa"},{"id":"ds_myauto","name":"大新 MyAuto 車主卡","issuer":"Dah Sing","type":"cashback","net":"Visa"},{"id":"ds_oneplus","name":"大新 ONE+","issuer":"Dah Sing","type":"cashback","net":"Mastercard"},{"id":"ds_ba","name":"大新英國航空白金卡","issuer":"Dah Sing","type":"miles","net":"Visa"},{"id":"fubon_infinite","name":"富邦 Visa Infinite","issuer":"Fubon","type":"cashback","net":"Visa"},{"id":"fubon_plat","name":"富邦 Visa 白金卡","issuer":"Fubon","type":"cashback","net":"Visa"},{"id":"fubon_insb","name":"富邦 iN ShopBack Visa白金卡","issuer":"Fubon","type":"cashback","net":"Visa"},{"id":"fubon_in","name":"富邦 iN Visa 白金卡","issuer":"Fubon","type":"cashback","net":"Visa"},{"id":"hsbc_everymile","name":"HSBC EveryMile","issuer":"HSBC","type":"miles","net":"Visa"},{"id":"hsbc_debit","name":"HSBC MC 扣賬卡","issuer":"HSBC","type":"cashback","net":"Mastercard"},{"id":"hsbc_premier","name":"HSBC Premier MC","issuer":"HSBC","type":"both","net":"Mastercard"},{"id":"hsbc_red","name":"HSBC Red","issuer":"HSBC","type":"both","net":"Mastercard"},{"id":"hsbc_vs","name":"HSBC Visa Signature","issuer":"HSBC","type":"both","net":"Visa"},{"id":"hsbc_plat","name":"HSBC Visa 白金卡","issuer":"HSBC","type":"both","net":"Visa"},{"id":"hsbc_easy","name":"HSBC easy 卡","issuer":"HSBC","type":"both","net":"Visa"},{"id":"hsbc_student","name":"HSBC 學生卡","issuer":"HSBC","type":"both","net":"Visa"},{"id":"hsbc_gold","name":"HSBC 金卡","issuer":"HSBC","type":"both","net":"Visa / Mastercard"},{"id":"hsbc_pulse","name":"HSBC 銀聯 Pulse","issuer":"HSBC","type":"both","net":"銀聯"},{"id":"hs_mmpower","name":"恒生 MMPOWER","issuer":"Hang Seng","type":"cashback","net":"Mastercard"},{"id":"hs_muji","name":"恒生 Muji 卡","issuer":"Hang Seng","type":"cashback","net":"Visa"},{"id":"hs_prestige","name":"恒生 Prestige World MC","issuer":"Hang Seng","type":"both","net":"Mastercard"},{"id":"hs_travel","name":"恒生 Travel+","issuer":"Hang Seng","type":"cashback","net":"Visa"},{"id":"hs_enjoy","name":"恒生 enJoy 卡","issuer":"Hang Seng","type":"cashback","net":"Visa"},{"id":"hs_uni","name":"恒生大學/大專卡","issuer":"Hang Seng","type":"cashback","net":"Visa / Mastercard"},{"id":"icbc_star","name":"工銀宇宙星座卡","issuer":"ICBC Asia","type":"cashback","net":"Visa / 銀聯"},{"id":"icbc_gba","name":"工銀粵港澳灣區銀聯鑽石","issuer":"ICBC Asia","type":"cashback","net":"銀聯"},{"id":"mox_miles","name":"MOX（Asia Miles）","issuer":"Mox Bank","type":"miles","net":"Mastercard"},{"id":"mox_cb","name":"MOX（CashBack）","issuer":"Mox Bank","type":"cashback","net":"Mastercard"},{"id":"sc_apoint","name":"渣打 A. Point Card","issuer":"Standard Chartered","type":"cashback","net":"Visa"},{"id":"sc_simply","name":"渣打 Simply Cash","issuer":"Standard Chartered","type":"cashback","net":"Visa"},{"id":"sc_smart","name":"渣打 Smart 卡","issuer":"Standard Chartered","type":"cashback","net":"Visa"},{"id":"sc_cathay_pb","name":"渣打國泰-優先理財（藍卡）","issuer":"Standard Chartered","type":"miles","net":"Mastercard"},{"id":"sc_cathay_pp","name":"渣打國泰-私人理財（黑卡）","issuer":"Standard Chartered","type":"miles","net":"Mastercard"},{"id":"sc_cathay","name":"渣打國泰（綠卡）","issuer":"Standard Chartered","type":"miles","net":"Mastercard"},{"id":"za_card","name":"ZA Card","issuer":"ZA Bank","type":"cashback","net":"Visa"},{"id":"za_credit","name":"ZA Credit","issuer":"ZA Bank","type":"cashback","net":"Visa"},{"id":"sim_card","name":"sim Credit Card（黃卡）","issuer":"sim","type":"cashback","net":"Mastercard"},{"id":"sim_world","name":"sim World MC（紫卡）","issuer":"sim","type":"cashback","net":"Mastercard"},{"id":"ds_earnmore","name":"安信 EarnMORE","issuer":"安信","type":"cashback","net":"銀聯"},{"id":"ds_wewa_vs","name":"安信 WeWa Visa Sig","issuer":"安信","type":"cashback","net":"Visa"},{"id":"ds_wewa_up","name":"安信 WeWa 銀聯卡","issuer":"安信","type":"cashback","net":"銀聯"}];
+const SCENARIOS = ["local","dining","onlineHKD","onlineFX","physicalFX","supermarket","transport","fuel","mobilePay","octopus","octopusManual","travelCN","travelTW","travelJKSTA","flightDirect","flightOTA","hotelDirect","hotelOTA","medical","fitness","pet","cinema","rent","manual"];
+// ====================================================================================================
+// END SwipeWhich-derived data
+// ====================================================================================================
+const CARD_BY_ID = Object.fromEntries(CARDS.map(c => [c.id, c]));
+const APP_DATA_URL = "https://www.swipewhich.com/app-data.json";
+const SC_LABEL = {local:"本地一般",dining:"食飯",onlineHKD:"網購（港幣）",onlineFX:"網購（外幣）",physicalFX:"海外實體",supermarket:"超市",transport:"交通",fuel:"油站",mobilePay:"手機支付",octopus:"八達通自動增值",octopusManual:"八達通手動增值",travelCN:"中國內地",travelTW:"台灣",travelJKSTA:"日韓新泰澳",flightDirect:"機票官網",flightOTA:"機票 OTA",hotelDirect:"酒店官網",hotelOTA:"酒店 OTA",medical:"醫療",fitness:"健身",pet:"寵物",cinema:"戲院",rent:"租金",manual:"手動"};
+const REGS = [
+  ["everyMileReg","EveryMile 海外簽賬優惠","HSBC EveryMile"],["pulseReg","Pulse 中國內地/澳門 +2%","HSBC 銀聯 Pulse"],
+  ["aeExplorerReg","Explorer 簽賬賞（本地＋外幣）","AE Explorer"],["aeChargeReg","鋼卡外幣推廣","AE 白金卡（簽賬卡）"],
+  ["mmpowerReg","MMPOWER 回贈計劃","恒生 MMPOWER"],["travelPlusReg","Travel+ 回贈計劃","恒生 Travel+"],
+  ["dbsEminentReg","Eminent 5% 登記","DBS Eminent"],["beaWorldReg","World 5% 食飯/海外回贈","東亞 World"],
+  ["ccbEyeReg","eye 食飯 11% 加碼","建行 eye"],["wewaQ3Reg","WeWa 季度登記","安信 WeWa"],
+];
+const VS = [["world","賞世界","外幣／機票酒店官網"],["savour","賞滋味","食飯"],["home","賞家居","超市"],["lifestyle","賞享受","Gym／交通／油站／OTA"],["shopping","賞購物","百貨"]];
+const OPTS = [
+  ["guru","HSBC Travel Guru",[["none","冇登記"],["L1","Lv1 GO +3%"],["L2","Lv2 GING +4%"],["L3","Lv3 GURU +6%"]]],
+  ["hsbcDining","滙豐餐飲優惠",[["none","未登記"],["registered","已登記"]]],
+  ["scSmartTier","渣打 Smart 等級",[["low","low"],["mid","mid"],["high","high"]]],
+  ["dbsLfFx","DBS Live Fresh 自選類別",[["none","未登記"],["fx","網上外幣"],["travel","旅遊娛樂"],["fashion","潮流教主"],["charity","慈善關愛"]]],
+  ["bocMs","中銀 選項 A（bocMs）",[["none","none"],["both","both"]]],
+  ["bocMf","中銀 選項 B（bocMf）",[["none","none"],["both","both"]]],
+  ["wewaCategory","安信 WeWa 自選類別",[["none","未登記"],["overseas","海外簽賬"],["mobilePay","手機支付"],["travel","旅遊"],["entertainment","線上娛樂"]]],
+  ["moxTier","Mox 高級別",[["false","否"],["true","係"]]],
+  ["mode","排名模式",[["cashback","現金回贈"],["miles","里數"]]],
+];
+const DEFAULT_CARD_MAP = [[/^CNCBI GBA.*Card/i,"cncbi_gba"],[/^CNCBI JD.*Card/i,"cncbi_jd"],[/^CNCBI Motion.*Card/i,"cncbi_motion"],[/^HSBC easy.*Card/i,"hsbc_easy"],[/^HSBC EveryMile.*Card/i,"hsbc_everymile"],[/^HSBC Gold.*Card/i,"hsbc_gold"],[/^HSBC Platinum.*Card/i,"hsbc_plat"],[/^HSBC Premier.*Card/i,"hsbc_premier"],[/^HSBC Pulse.*Card/i,"hsbc_pulse"],[/^HSBC Red.*Card/i,"hsbc_red"],[/^HSBC Student.*Card/i,"hsbc_student"],[/^HSBC Visa Signature.*Card/i,"hsbc_vs"]];
+const EXCLUDE = [/^PAYMENT\s*-?\s*THANK YOU/i,/^PAYMENT REVERSAL/i,/FINANCE CHARGE/i,/LATE CHARGE/i,/^IBANKING PAYMENT/i,/MONTHLY CASH REBATE/i,/^INTEREST/i];
+const PAY_PREFIX = /^(APPLEPAY|SALES:|QR|RETURN:)\s*/i;
+const USER_RULES = [[/\bMTR\b/i,"transport"],[/netflix|spotify|disney|apple\.com/i,"onlineFX"]];
+const PREFIX_RULES = [[/^APPLEPAY/i,"mobilePay"],[/^QR /i,"mobilePay"]];
+const ONLINE_HINTS = ["netflix","spotify","disney","apple.com","amazon","order ",".com"];
+// alias tokens never used for matching: place names / generic words (mirrors config.example.json merchant_alias_stop)
+const ALIAS_STOP = ["aberdeen", "admiralty", "bakery", "bangkok", "beijing", "cafe", "card", "causeway", "center", "central", "centre", "cheung", "china", "chung", "cinema", "city", "club", "coffee", "cotai", "dining", "express", "fanling", "fitness", "food", "garden", "group", "guangzhou", "home", "hong", "hotel", "house", "international", "japan", "jordan", "kennedy", "kitchen", "kong", "korea", "kowloon", "kwai", "kwun", "lantau", "limited", "living", "london", "macao", "macau", "mall", "market", "mong", "music", "online", "plaza", "pokfulam", "quarry", "rent", "restaurant", "seoul", "shanghai", "shatin", "shenzhen", "sheung", "shop", "shui", "singapore", "stanley", "store", "taikoo", "taipa", "taipei", "taiwan", "tokyo", "tong", "town", "travel", "tseung", "tsim", "tsuen", "tsui", "tuen", "wanchai", "wine", "yuen", "zhuhai"];
+const FALLBACK = {mobilePay:["local"],transport:["local"],medical:["local"],travelCN:["physicalFX","local"],onlineFX:["physicalFX","local"],physicalFX:["onlineFX","local"]};
+const AUTO_TAG = "[auto]";
+// payment channel forces a rate regardless of learned/user values (mirrors config.example.json channel_rules)
+const CHANNEL_RULES = [{cardId:"hsbc_pulse",scenario:"travelCN",re:/^SALES:|tencent|wechat|weixin|taobao|eleme|alipay|zhifubao/i,rate:"no-bonus",note:"網上卡號／微信／支付寶：無 Pulse +2%、無最紅自主，Travel Guru 照計（Pulse 條款：+2% 只限 Reward+／雲閃付掃碼或 Apple/Google/Samsung Pay）"}];
+function channelRule(r){ return CHANNEL_RULES.find(c=>c.cardId===r.cardId&&c.scenario===r.scenario&&c.re.test(r.desc)); }
+
+// ====================================================================================================
+// BEGIN SwipeWhich-derived rate engine
+// Everything from here down to the matching END marker is derived from SwipeWhich's front-end and is
+// NOT covered by this repository's MIT license. See LICENSE.
+// ====================================================================================================
+// ---------------------------------------------------------------- rate engine
+// Port of SwipeWhich bundle module 455 `FC` (cashback rate) / `L` / `G`. Inferred from bundle 2.0.4 (2026-09-11).
+// FROZEN at app 2.0.4 (decision 22): matched the engine in chunk 2565-b2d113f70d98cb47 exactly over 209,664 combinations,
+// and is deliberately no longer updated to track SwipeWhich. Base rates and merchant offers come from the user's
+// app-data.json; the hard-coded logic (per-card branches, Travel Guru annual RC cap, EveryMile quarterly tier) is frozen.
+// Per-card spend caps (capAmt / sharedCap / post-cap rates) are NOT modelled, so rates past such a cap are overstated.
+// tests/engine_check.py checks the ports against the cached 2.0.4 bundle only; if the app changes, do NOT chase it.
+// Mirrors planto2sw.py sw_rate().
+// card: {id, issuer, net, cashback:{sc:rate}, otaFromFXcb}; knobs: {vs, guru, moxTier, dbsLfFx, wewaCat, regs, guruRemainingRc, emFxQuarterSpent, hsbcCat}
+const SW_VS_CB = {world:["onlineFX","physicalFX","travelJKSTA","travelTW","travelCN","flightDirect","hotelDirect"],savour:["dining"],home:["supermarket"],lifestyle:["fitness","transport","fuel","flightOTA","hotelOTA","cinema"],shopping:[]};
+const SW_VS0 = {world:0,savour:0,home:0,lifestyle:0,shopping:0};
+const SW_FX4 = ["physicalFX","travelJKSTA","travelTW","travelCN"];
+const SW_FX5 = ["onlineFX","physicalFX","travelJKSTA","travelTW","travelCN"];
+const SW_FX_ALL = ["onlineFX","physicalFX","travelJKSTA","travelTW","travelCN","flightDirect","flightOTA","hotelDirect","hotelOTA"];
+const SW_AE_EXPLORER_SCS = [...SW_FX_ALL,"local","dining","onlineHKD","supermarket","transport","fuel","mobilePay","fitness","medical","pet","cinema"];
+const SW_HSBC_FAMILY = ["hsbc_vs","hsbc_plat","hsbc_gold","hsbc_pulse","hsbc_easy","hsbc_student","hsbc_premier"];
+const SW_VS_BONUS_SCS = ["onlineFX","physicalFX","travelJKSTA","travelTW","dining","supermarket","flightDirect","flightOTA","hotelDirect","hotelOTA","fitness","transport","fuel","cinema"];
+const SW_GURU = {L1:.03,L2:.04,L3:.06};
+const SW_GURU_CAP = {L1:500,L2:1200,L3:2200};
+const SW_WEWA_CATS = {overseas:["onlineFX","physicalFX","travelJKSTA","travelTW","travelCN"],mobilePay:["mobilePay"],travel:["flightDirect","flightOTA","hotelDirect","hotelOTA"]};
+const SW_WEWA_Q3 = {start:"2026-07-01",end:"2026-09-30",scs:["physicalFX","travelJKSTA","travelTW","travelCN"]};
+const SW_NO_RENT = new Set(["ae_explorer","ae_plat_cc","ae_plat_charge","ae_blue","bea_jcb","aeon_purple_jcb"]);
+const SW_RENT_FEE_OVERRIDE = {ds_ba:.019,ds_ana:.015,ds_oneplus:.015,ds_myauto:.019,ds_kitty:.019,fubon_in:.019,fubon_insb:.019,fubon_plat:.019,fubon_infinite:.019,sim_card:.015,sim_world:.015};
+const SW_PULSE_PROMO_END = "2026-12-31", SW_DS_TRAVEL_PROMO_END = "2026-04-19";
+function swToday(){ return new Date().toLocaleDateString("sv-SE",{timeZone:"Asia/Hong_Kong"}); }
+function swVsNorm(e){
+  if(!e) return {...SW_VS0};
+  if(typeof e==="string") return e==="none"?{...SW_VS0}:{...SW_VS0,[e]:5};
+  if(Array.isArray(e)){ const a=e.filter(x=>x&&x!=="none"); if(!a.length) return {...SW_VS0}; const n=Math.floor(5/a.length), t=5-n*a.length; return a.reduce((o,k,i)=>(o[k]=n+(i<t?1:0),o),{...SW_VS0}); }
+  return typeof e==="object"?{...SW_VS0,...e}:{...SW_VS0};
+}
+function swVsSlots(vs,sc){ const t=swVsNorm(vs); for(const k of Object.keys(SW_VS_CB)) if(SW_VS_CB[k].includes(sc)) return t[k]||0; return 0; }
+function swGuruBlend(base,g,amt,rem){ if(rem==null||rem<=0) return base; const r=rem/g; return amt<=r?base+g:(r*(base+g)+(amt-r)*base)/amt; }
+function swEmTier(amt,q){ if(q==null||amt<=0) return .025; if(q>=15000) return .01; if(q+amt<=15000) return .025; const n=15000-q; return (.025*n+(amt-n)*.01)/amt; }
+function swRentFee(card){ if(Object.hasOwn(SW_RENT_FEE_OVERRIDE,card.id)) return SW_RENT_FEE_OVERRIDE[card.id]; const net=card.net; return net?(net.includes("Amex")?0:net.includes("Mastercard")?.016:.02):.02; }
+function swMoxUnlockedMpd(){ return "2026-06-30">=swToday()?4:5; }
+function swRateG(card,a,amt,cur,k){
+  const v=a, p=k.regs, t=k.guru, r=k.moxTier, o=k.dbsLfFx, l=k.wewaCat, n=k.vs, g=amt||0, f=cur||"", b=k.guruRemainingRc??null, y=k.emFxQuarterSpent??null, _=k.hsbcCat??null;
+  if((f==="HKD"||f==="")&&(a==="hotelOTA"||a==="flightOTA")&&card.otaFromFXcb?.[a]) a="onlineHKD";
+  if(card.id==="ae_explorer"&&SW_AE_EXPLORER_SCS.includes(a)&&p&&p.aeExplorerReg===false) return .006;
+  if(card.id==="ae_plat_charge"&&SW_FX_ALL.includes(a)&&p&&!p.aeChargeReg) return SW_FX5.includes(a)?.008:.004;
+  if(card.id==="hs_mmpower"&&p&&!p.mmpowerReg||card.id==="hs_travel"&&p&&!p.travelPlusReg) return .004;
+  if((card.id==="dbs_eminent_vs"||card.id==="dbs_eminent_plat")&&["dining","medical","fitness"].includes(a)&&(p&&!p.dbsEminentReg||g>0&&g<300)) return .01;
+  if(card.id==="bea_world"&&p&&!p.beaWorldReg) return .004;
+  if(card.id==="ccb_eye"&&a==="dining"&&p&&!p.ccbEyeReg) return .02;
+  if(card.id==="ccb_eye"&&a==="dining"&&g>0&&g<500) return .04;
+  if((card.id==="mox_cb"||card.id==="mox_miles")&&(a==="octopus"||a==="octopusManual")) return 0;
+  if(card.id==="mox_cb"&&r) return a==="supermarket"?.03:.02;
+  if(card.id==="mox_miles"&&r) return .04/swMoxUnlockedMpd();
+  if(card.id==="sc_smart"&&p?.scSmartTier){ if(p.scSmartTier==="low") return 0; if(p.scSmartTier==="high") return .012; }
+  if(card.id==="dbs_live"){
+    if(o==="none") return a==="onlineFX"?.01:.004;
+    if(o==="fx"&&a==="onlineFX") return .06;
+    if(o==="fx"&&a==="onlineHKD") return .004;
+    if(o==="travel"&&["flightDirect","flightOTA","hotelDirect","hotelOTA"].includes(v)) return .05;
+    if(o==="travel"&&a==="onlineFX") return .01;
+    if(o==="travel"&&a==="onlineHKD") return .004;
+  }
+  if(card.id==="ds_wewa_vs"||card.id==="ds_wewa_up"){
+    const cat=(l&&typeof l==="object")?(l[card.id]??"none"):l;
+    const n2=(SW_WEWA_CATS[cat||"overseas"]||[]).includes(a)?.04:.004;
+    const today=swToday();
+    if(SW_WEWA_Q3.scs.includes(a)&&today>=SW_WEWA_Q3.start&&today<=SW_WEWA_Q3.end&&!(p&&p.wewaQ3Reg===false)) return .1;
+    return card.id==="ds_wewa_up"&&["travelJKSTA","travelTW","travelCN"].includes(a)&&SW_DS_TRAVEL_PROMO_END>=today?n2+.05:n2;
+  }
+  if(card.id==="ds_earnmore"&&["travelJKSTA","travelTW","travelCN"].includes(a)&&SW_DS_TRAVEL_PROMO_END>=swToday()) return .07;
+  if(card.id==="hsbc_everymile"&&SW_FX5.includes(a)){
+    const e=p&&!p.everyMileReg?.01:swEmTier(g,y);
+    if(!t||t==="none"||a==="onlineFX") return e;
+    const n2=SW_GURU[t];
+    return b!=null?swGuruBlend(e,n2,g,b):e+n2;
+  }
+  if(SW_HSBC_FAMILY.includes(card.id)){
+    const r2=_?(swVsNorm(n)[_]||0):swVsSlots(n,a);
+    const pulseOn=SW_PULSE_PROMO_END>=swToday()&&(!p||p.pulseReg!==false);
+    if(card.id==="hsbc_pulse"&&a==="onlineFX"&&f==="CNY"){ const e=(1+r2)*.004; return pulseOn?e+.02:e; }
+    if(SW_FX4.includes(a)){
+      let n2=card.id==="hsbc_vs"?(4+r2)*.004:(1+r2)*.004;
+      if(card.id==="hsbc_pulse"&&a==="travelCN"&&pulseOn) n2+=.02;
+      if(t&&t!=="none"){ const e=SW_GURU[t]; return b!=null?swGuruBlend(n2,e,g,b):n2+e; }
+      return n2;
+    }
+    if(r2>0) return card.id==="hsbc_vs"?(4+r2)*.004:(1+r2)*.004;
+    if(card.id==="hsbc_vs"&&(_||SW_VS_BONUS_SCS.includes(a))) return .016;
+  }
+  return card.cashback[a]||0;
+}
+function swRate(card,sc,amt,cur,k){
+  if(sc==="rent"&&SW_NO_RENT.has(card.id)) return 0;
+  const f=swRateG(card,sc,amt,cur,k||{});
+  return sc==="rent"?Math.max(0,f-swRentFee(card)):f;
+}
+function addYear(d){ const [y,m,dd]=d.split("-").map(Number); const t=new Date(Date.UTC(y+1,m-1,dd)); return t.toISOString().slice(0,10); }   // JS setMonth(+12) overflow (Feb 29 -> Mar 1)
+function guruWindow(sw){
+  const start=sw.guruStartDate; if(!sw.guru||sw.guru==="none"||!/^\d{4}-\d{2}-\d{2}$/.test(start||"")) return null;
+  const end=addYear(start), today=swToday();
+  if(today<start||today>=end) return {active:false};
+  const bd=sw.guruRcBaselineDate; const from=(bd&&bd>=start&&bd<end)?bd:start;
+  return {active:true,start,from,end,cap:SW_GURU_CAP[sw.guru],rate:SW_GURU[sw.guru],baseline:Number(sw.guruRcBaseline)||0};
+}
+// ====================================================================================================
+// END SwipeWhich-derived rate engine
+// ====================================================================================================
+// --- engine inputs from this page's state (mirrors planto2sw.py Converter.knobs / replay) ---
+function swCard(id){ const c=CARD_BY_ID[id]||{id}; const p=S.appData?.cardData.cardPromos[id]||{}; return {id,issuer:c.issuer,net:c.net,cashback:p.cashback||{},otaFromFXcb:p.otaFromFXcb||null}; }
+function swKnobs(sw){
+  const regs={}; REGS.forEach(([k])=>{regs[k]=sw[k]!==false;}); regs.scSmartTier=sw.scSmartTier||"mid"; regs.promoRegs=sw.promoRegs||{};
+  return {vs:sw.vs||{},guru:sw.guru||"none",moxTier:!!sw.moxTier,dbsLfFx:sw.dbsLfFx||"none",wewaCat:sw.wewaCategory||"none",regs,hsbcCat:null};
+}
+// Travel Guru: false (default) = pool the FX spend of all eligible HSBC cards (HSBC T&C 9c, corrected 2026-09-12;
+// decisions 19). true = the refuted reading where each calendar month only the HSBC card with the highest FX spend
+// earns the bonus; kept only to reproduce old figures. Mirrors config.example.json guru_monthly_top_card.
+const GURU_MONTHLY_TOP_CARD = false;
+function quarterOf(day){ const y=+day.slice(0,4), q=Math.floor((+day.slice(5,7)-1)/3); const qs=`${y}-${String(3*q+1).padStart(2,"0")}-01`; const qe=q===3?`${y+1}-01-01`:`${y}-${String(3*q+4).padStart(2,"0")}-01`; return [qs,qe]; }
+const HSBC_IDS = new Set(CARDS.filter(c=>c.issuer==="HSBC").map(c=>c.id));
+function computeEngine(){
+  // Replay snapshot logs + new rows strictly in date order, as if typed into the app one by one.
+  // Travel Guru: by default every eligible HSBC card's FX spend earns the bonus and draws on one shared annual RC cap
+  // (T&C 9c). Only with the top-card toggle (S.opts.guruTopCard) does the month's highest-FX-spend card alone earn it.
+  // EveryMile's FX quarter total (2.5% -> 1% after $15,000) also accumulates in order.
+  if(!S.appData) return;
+  const sw={...(S.sw||{}),...S.settings}, base=swKnobs(sw), guru=guruWindow(sw);
+  const rows=S.rows.filter(r=>r.status==="ok"&&r.include);
+  const regen=new Set(rows.map(r=>r.id));   // snapshot copies of the rows being regenerated must not count twice
+  const items=[...(S.sw?.logs||[]).filter(l=>!regen.has(l.id)).map(l=>({day:String(l.day||l.date||"").slice(0,10),cardId:l.cardId,scenario:l.scenario,amount:Number(l.amount)||0,row:null})),
+    ...rows.map(r=>({day:r.date,cardId:r.cardId,scenario:r.scenario,amount:rowHkd(r),row:r}))]
+    .sort((a,b)=>a.day.localeCompare(b.day)||(a.row?a.row.row:0)-(b.row?b.row.row:0));
+  const eligible=it=>guru&&guru.active&&HSBC_IDS.has(it.cardId)&&SW_FX4.includes(it.scenario)&&it.day>=guru.start&&it.day<guru.end;
+  const top={};   // month -> card with the highest eligible FX spend that month (whole month, even before the baseline date); used only by the top-card toggle
+  if(guru&&guru.active){ const m={}; for(const it of items) if(eligible(it)){ const k=it.day.slice(0,7); m[k]=m[k]||{}; m[k][it.cardId]=(m[k][it.cardId]||0)+it.amount; } for(const k in m) top[k]=Object.entries(m[k]).sort((a,b)=>b[1]-a[1])[0][0]; }
+  const isGuru=it=>eligible(it)&&it.day>=guru.from&&(!S.opts.guruTopCard||top[it.day.slice(0,7)]===it.cardId);   // earns/consumes RC only from the baseline date on
+  let earned=guru&&guru.active?guru.baseline:0; const emQ={};
+  for(const it of items){
+    if(it.row){
+      const r=it.row, k={...base};
+      if(guru&&guru.active){ if(isGuru(it)) k.guruRemainingRc=Math.max(0,guru.cap-Math.min(earned,guru.cap)); else k.guru="none"; }
+      const cr=channelRule(r); if(cr&&cr.rate==="no-bonus"){ k.regs={...k.regs,pulseReg:false}; k.vs={}; }   // channel without Pulse +2% / 最紅自主, Guru still applies
+      if(r.cardId==="hsbc_everymile") k.emFxQuarterSpent=emQ[quarterOf(it.day)[0]]||0;
+      r.engRate=swRate(swCard(r.cardId),r.scenario,it.amount,r.cur,k);
+    }
+    if(isGuru(it)) earned+=it.amount*guru.rate;
+    if(it.cardId==="hsbc_everymile"&&SW_FX5.includes(it.scenario)){ const qs=quarterOf(it.day)[0]; emQ[qs]=(emQ[qs]||0)+it.amount; }
+  }
+}
+
+// ---------------------------------------------------------------- state
+const S = { existing:null, sw:null, settings:{}, appData:null, appDataSrc:"", appDataErr:"", appDataNotes:[], rows:[], cardMap:{}, rates:{}, learned:{}, logs:[], customRules:[], opts:{guruTopCard:GURU_MONTHLY_TOP_CARD} };
+// personal merchant rules typed in step 3: kept in this browser only (localStorage p2s_rules), checked before USER_RULES
+function parseCustomRules(text){
+  const rules=[], bad=[];
+  for(const line of String(text||"").split(/\n/)){ const t=line.trim(); if(!t||t.startsWith("#")) continue;
+    const m=t.match(/^(.*?)\s*=>\s*([A-Za-z]+)$/);
+    if(!m||!m[1]||!SCENARIOS.includes(m[2])){ bad.push(t); continue; }
+    try{ rules.push([new RegExp(m[1],"i"),m[2]]); }catch{ bad.push(t); } }
+  return {rules,bad};
+}   // opts: tool behaviour, never written into sw_data
+const $ = s => document.querySelector(s);
+
+// ---------------------------------------------------------------- utils
+function parseCSV(text){
+  const rows=[]; let row=[], field="", q=false;
+  text = text.replace(/^\uFEFF/,"");
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c=='"'){ if(text[i+1]=='"'){field+='"';i++;} else q=false; } else field+=c; }
+    else if(c=='"') q=true;
+    else if(c==','){row.push(field);field="";}
+    else if(c=='\n'){row.push(field);rows.push(row);row=[];field="";}
+    else if(c=='\r'){}
+    else field+=c;
+  }
+  if(field.length||row.length){row.push(field);rows.push(row);}
+  const hdr=rows.shift().map(h=>h.trim());
+  return rows.filter(r=>r.length>1).map(r=>Object.fromEntries(hdr.map((h,i)=>[h,(r[i]||"").trim()])));
+}
+async function sha1hex(s){ const b=await crypto.subtle.digest("SHA-1",new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+async function detId(...parts){ const h=await sha1hex(parts.join("|")); return 900000000000000 + Number(BigInt("0x"+h.slice(0,12)) % 100000000000000n); }
+const fmt = n => n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function b64utf8(s){ return btoa(unescape(encodeURIComponent(s))); }
+function unb64utf8(s){ return decodeURIComponent(escape(atob(s))); }
+
+// ---------------------------------------------------------------- step 1
+function loadExisting(text){
+  text=text.trim(); if(!text){S.existing=null;S.sw=emptySw();return "由空白開始";}
+  if(text.startsWith("SW1.")) text=unb64utf8(text.slice(4));
+  const outer=JSON.parse(text);
+  if(outer.app!=="swipewhich"||!outer.data) throw new Error("唔似碌邊張嘅備份");
+  outer.data.sw_data = JSON.parse(outer.data.sw_data||"{}");
+  if(typeof outer.data.sw_ui==="string"){ try{outer.data.sw_ui=JSON.parse(outer.data.sw_ui);}catch{} }
+  S.existing=outer; S.sw=outer.data.sw_data;
+  S.learned={};
+  for(const lg of (S.sw.logs||[])){ const k=lg.cardId+"|"+lg.scenario; if(!(k in S.learned)&&lg.amount&&lg.rate!=null) S.learned[k]=lg.rate; }
+  const ts=outer.ts?new Date(outer.ts).toLocaleString("zh-HK"):"?";
+  return `快照 ${ts}｜持有 ${(S.sw.own||[]).length} 張卡｜${(S.sw.logs||[]).length} 筆記賬｜schema _v=${S.sw._v??"?"}`;
+}
+function emptySw(){ return {_v:12,own:[],logs:[],recurring:[],customPromos:[],customMilestones:[],cardSettings:{},vs:{world:0,savour:0,home:0,lifestyle:0,shopping:0},guru:"none",hsbcDining:"none",scSmartTier:"mid",dbsLfFx:"none",bocMs:"none",bocMf:"none",moxTier:false,mode:"cashback",mileValue:0.1,promoRegs:{},milestoneEnroll:{}}; }
+$("#parseExisting").onclick=()=>{ try{ $("#existingSummary").textContent=loadExisting($("#existing").value); fillSettings(); renderRates(); renderLedger(); }catch(e){ $("#existingSummary").textContent="讀唔到："+e.message; } };
+$("#existingFile").onchange=async e=>{ const f=e.target.files[0]; if(!f)return; $("#existing").value=await f.text(); $("#parseExisting").click(); };
+
+// ---------------------------------------------------------------- step 2
+function fillSettings(){
+  const sw=S.sw||emptySw();
+  $("#regs").innerHTML=REGS.map(([k,l,c])=>`<label class="toggle"><input type="checkbox" data-k="${k}" ${sw[k]!==false?"checked":""}><span>${l}<small>${c}</small></span></label>`).join("");
+  const vs=sw.vs||{};
+  $("#vs").innerHTML=VS.map(([k,l,d])=>`<div class="c">${l}<small>${d}</small><input type="number" min="0" max="5" data-vs="${k}" value="${vs[k]||0}"></div>`).join("");
+  $("#opts").innerHTML=OPTS.map(([k,l,vals])=>{ const cur=String(sw[k]??vals[0][0]); return `<div class="field"><label class="lbl">${l}</label><select data-opt="${k}">${vals.map(([v,t])=>`<option value="${v}" ${v===cur?"selected":""}>${t}</option>`).join("")}</select></div>`; }).join("")
+    +`<div class="field"><label class="lbl">每里價值（HK$/里）</label><input type="number" step="0.01" min="0" data-num="mileValue" value="${sw.mileValue??0.1}"></div>`
+    +`<div class="field"><label class="lbl">Travel Guru 計劃開始日（YYYY-MM-DD）</label><input type="text" data-txt="guruStartDate" value="${esc(sw.guruStartDate||"")}" placeholder="2026-01-01"></div>`
+    +`<div class="field"><label class="lbl">Guru 已賺 RC 基準（HK$）／基準日</label><div class="row"><input type="number" step="1" min="0" data-num="guruRcBaseline" value="${sw.guruRcBaseline||0}"><input type="text" data-txt="guruRcBaselineDate" value="${esc(sw.guruRcBaselineDate||"")}" placeholder="YYYY-MM-DD" style="width:140px"></div><span class="note">L3 年度上限 $2,200 RC（≈簽 $36,667 外幣／內地）。匯入歷史記賬會令 app 以為已爆 Cap，用基準日／基準值話俾佢知實際計到邊。</span></div>`;
+  $("#s2").querySelectorAll("input,select").forEach(el=>el.addEventListener("input",readSettings));
+  renderPromoToggles();
+  readSettings();
+}
+// per-offer registrations (promoRegs, regId from merchantOffers[].offers[].reg) and milestone campaigns
+// (milestoneEnroll, ids from cardData.milestonePromos) — both need the rule library, so they render once it is loaded
+function promoRegList(){
+  const m={};
+  for(const mo of S.appData?.cardData.merchantOffers||[]) for(const o of mo.offers||[]) if(o.reg){ m[o.reg]=m[o.reg]||{cards:new Set(),merchants:new Set()}; m[o.reg].cards.add(o.c); m[o.reg].merchants.add(mo.n); }
+  return Object.entries(m).map(([reg,v])=>({reg,cards:[...v.cards],merchants:[...v.merchants]}));
+}
+function renderPromoToggles(){
+  if(!S.appData) return;
+  const sw=S.sw||emptySw(), pr=sw.promoRegs||{}, me=sw.milestoneEnroll||{};
+  const regs=promoRegList();
+  $("#promoRegs").innerHTML=regs.length?regs.map(p=>`<label class="toggle"><input type="checkbox" data-preg="${esc(p.reg)}" ${pr[p.reg]!==false?"checked":""}><span>${esc(p.reg)}<small>${esc(p.merchants.slice(0,4).join("、"))}${p.merchants.length>4?"…":""}｜${esc(p.cards.map(c=>CARD_BY_ID[c]?.name||c).join("、"))}</small></span></label>`).join(""):`<span class="note">規則庫目前冇需要逐個登記嘅優惠</span>`;
+  const mp=S.appData.cardData.milestonePromos||{};
+  $("#milestones").innerHTML=Object.entries(mp).map(([id,m])=>`<label class="toggle"><input type="checkbox" data-mile="${esc(id)}" ${id in me?"checked":""}><span>${esc(id)}<small>${esc(m.startDate||"")}～${esc(m.endDate||"")}｜${(m.tiers||[]).map(t=>`$${t.threshold}→$${t.reward}`).join("、")}</small><input type="text" data-miledate="${esc(id)}" placeholder="登記日 YYYY-MM-DD（可留空）" value="${esc(me[id]?.enrollDate||"")}" style="width:190px;margin-top:4px"></span></label>`).join("")||`<span class="note">規則庫目前冇簽滿賞活動</span>`;
+  ["#promoRegs","#milestones"].forEach(s=>$(s).querySelectorAll("input").forEach(el=>el.addEventListener("input",readSettings)));
+  readSettings();
+}
+function readSettings(){
+  const st={};
+  $("#regs").querySelectorAll("input").forEach(i=>st[i.dataset.k]=i.checked);
+  const vs={}; let sum=0; $("#vs").querySelectorAll("input").forEach(i=>{vs[i.dataset.vs]=Math.max(0,Math.min(5,parseInt(i.value)||0)); sum+=vs[i.dataset.vs];}); st.vs=vs;
+  $("#vsSum").textContent=`合共 ${sum}/5`; $("#vsSum").className="tag"+(sum>5?" bad":sum?" ok":"");
+  $("#opts").querySelectorAll("select").forEach(s=>{ let v=s.value; if(s.dataset.opt==="moxTier") v=(v==="true"); st[s.dataset.opt]=v; });
+  st.mileValue=parseFloat($("[data-num=mileValue]").value)||0.1;
+  st.guruRcBaseline=parseFloat($("[data-num=guruRcBaseline]").value)||0;
+  $("#opts").querySelectorAll("[data-txt]").forEach(i=>st[i.dataset.txt]=i.value.trim());
+  if(S.appData){
+    const pr={...(S.sw?.promoRegs||{})}; $("#promoRegs").querySelectorAll("input").forEach(i=>{ if(i.checked) delete pr[i.dataset.preg]; else pr[i.dataset.preg]=false; }); st.promoRegs=pr;   // app: absent = registered, false = opted out
+    const me={...(S.sw?.milestoneEnroll||{})}; $("#milestones").querySelectorAll("input[type=checkbox]").forEach(i=>{ const id=i.dataset.mile; if(i.checked){ const d=($(`[data-miledate="${id}"]`)?.value||"").trim(); me[id]={enrollDate:d||null}; } else delete me[id]; }); st.milestoneEnroll=me;
+  }
+  S.settings=st; renderEff();
+  if(S.rows.length&&S.appData) refreshRates();   // step-3 rates follow the settings live
+}
+function renderEff(){
+  const st=S.settings; const on=REGS.filter(([k])=>st[k]).map(([,l])=>l);
+  const vs=Object.entries(st.vs||{}).filter(([,v])=>v).map(([k,v])=>`${VS.find(x=>x[0]===k)[1]}×${v}`).join("、")||"未揀";
+  const optOut=Object.entries(st.promoRegs||{}).filter(([,v])=>v===false).map(([k])=>k), miles=Object.keys(st.milestoneEnroll||{});
+  $("#effSettings").innerHTML=`<div>登記：${on.length?on.join("、"):"全部關閉"}</div><div>最紅自主：${vs}</div><div>Guru：${st.guru}${st.guruStartDate?"（自 "+st.guruStartDate+"）":""}${st.guruRcBaseline?"，基準 $"+st.guruRcBaseline:""}｜餐飲：${st.hsbcDining}｜SC Smart：${st.scSmartTier}｜DBS LF：${st.dbsLfFx}｜Mox：${st.moxTier?"係":"否"}｜WeWa：${st.wewaCategory||"none"}</div><div>優惠退出：${optOut.length?optOut.join("、"):"無"}｜簽滿賞：${miles.length?miles.join("、"):"無"}</div>`;
+}
+
+// ---------------------------------------------------------------- step 0: the rule library
+// The library is never bundled and never fetched automatically: SwipeWhich revises the rates regularly, and a stale
+// copy shows wrong numbers. The user supplies app-data.json (paste, drop or file picker), or clicks 一鍵攞最新, whose
+// click handler fetchAppData() is the only place APP_DATA_URL is fetched. The CLI uses the same stale threshold.
+const APP_DATA_STALE_DAYS = 30;
+const APP_DATA_LS_KEY = "p2s_appdata";
+function appDataAgeDays(d){ const t=Date.parse(d?.generatedAt??""); return Number.isFinite(t)?Math.floor((Date.now()-t)/86400000):null; }
+// Assign the freshly parsed object as-is — never mutate one in place: merchantKeys() memoises on
+// MK.src===S.appData, so swapping the object identity is what invalidates the cache.
+function setAppData(obj,srcLabel){
+  if(!obj||typeof obj!=="object"||Array.isArray(obj)) throw new Error("唔似 app-data.json：頂層唔係一個 JSON 物件");
+  const cd=obj.cardData;
+  if(!cd||typeof cd!=="object") throw new Error("唔似 app-data.json：缺 cardData");
+  if(!cd.cardPromos) throw new Error("唔似 app-data.json：缺 cardData.cardPromos");
+  if(!cd.merchantOffers) throw new Error("唔似 app-data.json：缺 cardData.merchantOffers");
+  const notes=[];
+  if(obj.schemaVersion!==2) notes.push(`schemaVersion 係 ${esc(String(obj.schemaVersion))}，呢個工具淨係對住 2 驗證過，計出嚟嘅嘢可能唔啱。`);   // warn, not fatal
+  if(!lsSet(APP_DATA_LS_KEY,obj)) notes.push("記唔入呢個瀏覽器（個檔大，可能爆咗儲存上限，或者係無痕模式）：今次照用，下次開要再揀一次。");
+  S.appData=obj; S.appDataSrc=srcLabel; S.appDataErr=""; S.appDataNotes=notes;
+  renderAppDataStatus();
+  if(S.rows.length) buildAll();   // a CSV loaded before the library: classify it now
+  renderPromoToggles();
+}
+function useAppDataText(text,srcLabel){   // shared by paste, drag-drop and the file picker
+  let obj;
+  try{ obj=JSON.parse(String(text||"").trim()); }
+  catch(e){ S.appDataErr="JSON 讀唔到："+e.message; renderAppDataStatus(); return false; }
+  try{ setAppData(obj,srcLabel); return true; }
+  catch(e){ S.appDataErr=e.message; renderAppDataStatus(); return false; }
+}
+// The ONLY network call in this file, and it is only ever reached from the button's click handler.
+// Never call this on load, on a timer, or as a fallback: the page must never fetch automatically (see AGENTS.md).
+async function fetchAppData(){
+  const b=$("#appdataFetch"), was=b.textContent;
+  b.disabled=true; b.textContent="攞緊…";
+  try{
+    const r=await fetch(APP_DATA_URL,{cache:"no-store"});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    useAppDataText(await r.text(),"啱啱由碌邊張攞嘅最新版");
+  }catch(e){
+    if(S.appData){   // a library is already loaded: keep using it, just say the refresh failed
+      S.appDataNotes=[...(S.appDataNotes||[]).filter(n=>!String(n).startsWith("一鍵攞唔到")),
+        "一鍵攞唔到最新（"+esc(e.message)+"），繼續用緊而家呢份。可能係冇網，或者伺服器暫時用唔到"];
+    }else{
+      S.appDataErr="一鍵攞唔到（"+e.message+"）。可能係冇網，或者伺服器暫時用唔到。用下面三個方法任何一個都得";
+    }
+    renderAppDataStatus();
+  }finally{ b.disabled=false; b.textContent=was; }
+}
+async function pickAppData(file){
+  if(!file) return;
+  useAppDataText(await file.text(),`你揀嘅檔案 ${file.name}`);
+}
+function renderAppDataStatus(){
+  const el=$("#appdataStatus"); el.style.display="block";
+  const link=`<a href="${esc(APP_DATA_URL)}" target="_blank" rel="noopener">${esc(APP_DATA_URL)}</a>`;
+  if(S.appDataErr){ el.className="msg bad"; el.innerHTML=`規則庫檔案用唔到：${esc(String(S.appDataErr).replace(/。$/,""))}。請由 ${link} 重新下載一份 app-data.json，再喺上面揀個檔。`; return; }
+  const d=S.appData;
+  if(!d){ el.className="msg warn"; el.innerHTML=`仲未載入碌邊張規則庫。呢個工具唔會內置、亦唔會自己走去攞：撳上面「一鍵攞最新」，或者由 ${link} 自己另存一份 app-data.json，再喺前置嗰步揀個檔。未揀之前，第 2 步嘅逐個優惠登記同簽滿賞、第 3 步嘅費率表都會一直係空白。`; return; }
+  const age=appDataAgeDays(d), stale=age!==null&&age>APP_DATA_STALE_DAYS;
+  const when=age===null?"（個檔冇 generatedAt）":`${new Date(d.generatedAt).toLocaleString("zh-HK")}（${age} 日前）`;
+  const cards=Object.keys(d.cardData.cardPromos).length, merchants=(d.cardData.merchantOffers||[]).length;
+  const notes=(S.appDataNotes||[]).map(n=>`<div>⚠ ${n}</div>`).join("");   // already escaped where needed
+  el.className=stale||notes?"msg warn":"msg ok";
+  el.innerHTML=`規則庫已載入（${esc(S.appDataSrc||"")}）：schema ${esc(String(d.schemaVersion))}，產生於 ${esc(when)}，${cards} 張卡，${merchants} 個商戶。`
+    +notes
+    +(stale?`<div>⚠ 呢份已經 ${age} 日大（超過 ${APP_DATA_STALE_DAYS} 日）。碌邊張會定期修訂費率資料，舊嘅一份會顯示錯嘅數字，撳上面「一鍵攞最新」就得，或者由 ${link} 下載一份新嘅再揀入嚟。</div>`:"");
+}
+function clearAppData(){
+  S.appData=null; S.appDataSrc=""; S.appDataErr=""; S.appDataNotes=[]; MK=null;
+  try{ localStorage.removeItem(APP_DATA_LS_KEY); }catch{}
+  $("#appdataFile").value="";
+  $("#promoRegs").innerHTML=`<span class="note">載入規則庫後顯示</span>`; $("#milestones").innerHTML="";
+  $("#rates tbody").innerHTML=""; $("#review tbody").innerHTML=""; $("#generate").disabled=true;
+  renderAppDataStatus(); readSettings();
+}
+function restoreAppData(){   // page init: localStorage only, no network
+  const saved=lsGet(APP_DATA_LS_KEY,null);
+  if(saved){ try{ setAppData(saved,"呢個瀏覽器記住嘅檔案"); return; }catch(e){ S.appDataErr=e.message; } }
+  renderAppDataStatus();
+}
+$("#appdataFile").onchange=e=>pickAppData(e.target.files[0]);
+$("#appdataPaste").addEventListener("paste",e=>{   // parse straight off the clipboard: ~870KB rendered in a textarea is painfully slow
+  const t=(e.clipboardData||window.clipboardData).getData("text"); if(!t) return;
+  e.preventDefault(); useAppDataText(t,"你貼上嘅內容"); e.target.value="";
+});
+{ const z=$("#s0");
+  ["dragenter","dragover"].forEach(t=>z.addEventListener(t,e=>{ e.preventDefault(); z.classList.add("drop"); }));
+  z.addEventListener("dragleave",e=>{ if(!z.contains(e.relatedTarget)) z.classList.remove("drop"); });
+  z.addEventListener("drop",e=>{ e.preventDefault(); z.classList.remove("drop"); const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) pickAppData(f); });
+}
+$("#appdataFetch").onclick=fetchAppData;
+$("#appdataClear").onclick=clearAppData;
+
+// ---------------------------------------------------------------- step 3
+$("#csvFile").onchange=async e=>{
+  const f=e.target.files[0]; if(!f)return;
+  if(!S.sw){S.sw=emptySw(); fillSettings();}
+  const raw=parseCSV(await f.text());
+  S.rows=toRows(raw);
+  for(const r of S.rows) r.id=await detId(r.acct,r.date,r.amtRaw,r.cur,r.desc);   // deterministic log id, known before replay
+  const ds=S.rows.map(r=>r.date).filter(Boolean).sort(); $("#csvSummary").textContent=`${S.rows.length} 行，${ds[0]} 至 ${ds[ds.length-1]}`;
+  if(!S.appData){ renderAppDataStatus(); $("#s0").scrollIntoView({behavior:"smooth",block:"start"}); }   // buildAll() no-ops without the library; say why instead of going silent
+  buildCardMap(); buildAll();
+};
+function toRows(raw){
+  return raw.map((r,i)=>({row:i+2,acct:r["Account Name"],bank:r["Bank Name"],merchant:r["Merchant Name"],desc:(r["Original Description"]||r["Description"]||"").replace(/\s+/g," ").trim(),amtRaw:r["Amount"],amt:parseFloat(r["Amount"]||0),hkd:parseFloat(r["Amount in HKD"]||0),cur:(r["Currency"]||"").toUpperCase(),date:r["Transaction Date"],status:"",detail:"",scenario:"",layer:"",include:true}));
+}
+// Planto "Bank Name" -> SwipeWhich issuer, for guessing the card when the account name is not in DEFAULT_CARD_MAP
+const ISSUER_BY_BANK={"HSBC":"HSBC","Citic Bank":"CNCBI","Bank of China":"Bank of China","Hang Seng":"Hang Seng","Hang Seng Bank":"Hang Seng","Standard Chartered":"Standard Chartered","American Express":"American Express","DBS":"DBS","Citibank":"Citibank","Bank of East Asia":"BEA","Dah Sing":"Dah Sing","Dah Sing Bank":"Dah Sing","Mox":"Mox Bank","Mox Bank":"Mox Bank","ZA Bank":"ZA Bank","CCB":"CCB Asia","China Construction Bank":"CCB Asia","Fubon":"Fubon","ICBC":"ICBC Asia","AEON":"AEON","sim":"sim","PrimeCredit":"安信","BOCOM":"BoCom"};
+const GENERIC_TOKENS=new Set(["hsbc","visa","mastercard","card","credit","bank","the","platinum","world","gold"]);
+function guessCard(acct,bank){
+  const hit=DEFAULT_CARD_MAP.find(([re])=>re.test(acct)); if(hit) return hit[1];
+  if(!/\bcard\b/i.test(acct)) return "";   // Planto names every card account "... Card"; savings accounts (e.g. "… Account - Statement Savings") must never match a card name
+  const iss=ISSUER_BY_BANK[bank]; if(!iss) return "";
+  const a=acct.toLowerCase();
+  const cands=CARDS.filter(c=>c.issuer===iss&&c.name.toLowerCase().split(/[\s（）()／/·-]+/).some(t=>t.length>=3&&/^[a-z0-9]+$/.test(t)&&!GENERIC_TOKENS.has(t)&&a.includes(t)));
+  return cands.length===1?cands[0].id:"";   // only a unique hit; savings accounts never match a card name
+}
+function lsGet(k,d){ try{ const v=JSON.parse(localStorage.getItem(k)); return v==null?d:v; }catch{ return d; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch{ return false; } }   // false = not stored (quota, private mode)
+function buildCardMap(){
+  const accts={}, bank={}; S.rows.forEach(r=>{accts[r.acct]=(accts[r.acct]||0)+1; bank[r.acct]=r.bank;});
+  const saved=lsGet("p2s_cardMap",{});   // your earlier choices, remembered in this browser
+  S.cardMap={};
+  for(const a of Object.keys(accts)) S.cardMap[a]=a in saved?saved[a]:guessCard(a,bank[a]||"");
+  const opts=`<option value="">— 不匯入 —</option>`+CARDS.map(c=>`<option value="${c.id}">${c.issuer} · ${c.name}</option>`).join("");
+  $("#cardMap tbody").innerHTML=Object.entries(accts).sort((a,b)=>b[1]-a[1]).map(([a,n])=>`<tr><td>${esc(a)}<br><span class="note">${esc(bank[a]||"")}</span></td><td class="num">${n}</td><td><select data-acct="${esc(a)}">${opts}</select></td></tr>`).join("");
+  $("#cardMap").querySelectorAll("select").forEach(s=>{ s.value=S.cardMap[s.dataset.acct]||""; s.onchange=()=>{S.cardMap[s.dataset.acct]=s.value; lsSet("p2s_cardMap",{...lsGet("p2s_cardMap",{}),[s.dataset.acct]:s.value}); buildAll();}; });
+  $("#cardMapWrap").style.display="block";
+}
+function rowHkd(r){ const v=Math.round(Math.abs(r.hkd)*100)/100; return r.neg?-v:v; }   // log amount; negative for an unmatched refund
+
+// classification (mirrors planto2sw.py)
+function classify(r){
+  const text=(r.merchant+" "+r.desc.replace(PAY_PREFIX,"")).toLowerCase();
+  for(const [re,sc] of S.customRules) if(re.test(text)) return [sc,"你嘅自訂規則"];
+  for(const [re,sc] of USER_RULES) if(re.test(text)) return [sc,"你嘅規則"];
+  if(r.cur==="CNY"&&/\bCHN\b|\bCN\b|shenzhen|beijing|shanghai|guangzhou/i.test(r.desc)) return ["travelCN","人民幣＋內地"];
+  for(const [re,m] of merchantKeys()) if(re.test(text)&&m.sc?.length) return [m.sc[0],"商戶庫："+m.n];
+  if(r.cur!=="HKD"){ const online=ONLINE_HINTS.some(k=>text.includes(k)); return [online?"onlineFX":"physicalFX","外幣 "+r.cur]; }
+  for(const [re,sc] of PREFIX_RULES) if(re.test(r.desc)) return [sc,"手機支付前綴"];
+  return ["local","兜底 ⚠"];
+}
+// merchant library keys, longest first: Chinese name, English name (>= 4 chars), and alias tokens that are
+// unique in the library, not in ALIAS_STOP and not a bare number (mirrors planto2sw.py merchant_keys)
+let MK=null;
+function merchantKeys(){
+  if(MK&&MK.src===S.appData) return MK.keys;
+  const mo=S.appData.cardData.merchantOffers, stop=new Set(ALIAS_STOP), count={};
+  const toks=mo.map(m=>new Set((m.a||"").split(" ").filter(t=>t.length>=4).map(t=>t.toLowerCase())));
+  toks.forEach(ts=>ts.forEach(t=>{count[t]=(count[t]||0)+1;}));
+  const keys=[];
+  mo.forEach((m,i)=>{ const ks=new Set([m.n,m.en].filter(k=>k&&k.length>=4).map(k=>k.toLowerCase()));
+    toks[i].forEach(t=>{ if(count[t]===1&&!stop.has(t)&&!/^\d+$/.test(t)) ks.add(t); });
+    [...ks].sort().forEach(k=>keys.push([k,m])); });
+  keys.sort((a,b)=>b[0].length-a[0].length);   // stable: equal length keeps library order
+  MK={src:S.appData,keys:keys.map(([k,m])=>[new RegExp("(?<![a-z0-9])"+k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"(?![a-z0-9])"),m,k])};
+  return MK.keys;
+}
+function validScenario(cardId,sc){
+  const cb=S.appData.cardData.cardPromos[cardId]?.cashback||{};
+  if(sc in cb) return sc;
+  for(const fb of (FALLBACK[sc]||["local"])) if(fb in cb) return fb;
+  return "local";
+}
+function buildAll(){
+  if(!S.appData||!S.rows.length) return;
+  const rows=S.rows; rows.forEach(r=>{r.status="";r.detail="";r.cardId=S.cardMap[r.acct]||"";});
+  for(const r of rows){
+    const ex=EXCLUDE.find(re=>re.test(r.desc)); if(ex){r.status="excluded";r.detail="還款／利息／罰金／回贈入賬";continue;}
+    if(!r.cardId){r.status="no-card";r.detail="賬戶未對應";continue;}
+  }
+  // refund pairing
+  const live=rows.filter(r=>!r.status);
+  const refunds=live.filter(r=>r.amt>0&&/^RETURN:/i.test(r.desc)), spends=live.filter(r=>r.amt<0);
+  for(const rf of refunds){
+    const rd=new Date(rf.date);
+    const c=spends.filter(s=>!s.status&&s.acct===rf.acct&&Math.abs(Math.abs(s.amt)-rf.amt)<0.005&&(rd-new Date(s.date))/864e5>=0&&(rd-new Date(s.date))/864e5<=90).sort((a,b)=>b.date.localeCompare(a.date))[0];
+    if(c){c.status="refunded";c.detail=`已退款（第 ${rf.row} 行）`;rf.status="refund";rf.detail=`退款配對第 ${c.row} 行`;}
+    else{rf.neg=true;}   // unmatched refund -> negative log (the app nets it; verified 2026-09-11)
+  }
+  const existing=new Map((S.sw?.logs||[]).map(l=>[l.id,l]));
+  for(const r of live){ if(r.status)continue; if(r.amt>=0&&!r.neg){r.status="credit";r.detail="非退款嘅入賬";continue;}
+    if(!r.scenario||!r.userSet){ const [sc,layer]=classify(r); r.scenario=validScenario(r.cardId,sc); r.layer=layer+(r.scenario!==sc?`（${sc}→${r.scenario}）`:""); }
+    const old=existing.get(r.id);
+    if(old&&old.scenario!==r.scenario&&!r.userSet){ r.status="kept"; r.detail=`碌邊張已有呢筆，場景係 ${SC_LABEL[old.scenario]||old.scenario}（我哋會話 ${SC_LABEL[r.scenario]||r.scenario}）；以碌邊張為準`; continue; }   // the app's copy wins
+    const cr=channelRule(r); if(cr) r.layer+="｜"+cr.note;
+    if(r.neg) r.layer+="｜退款未配對 → 負數記賬";
+    r.status="ok"; }
+  // dedupe against logs the user already entered by hand (same card, ±1 day, same fx amount or HKD within 1%)
+  const manual=(S.sw?.logs||[]).filter(l=>!String(l.memo||"").includes(AUTO_TAG));
+  for(const r of live){ if(r.status!=="ok"||r.neg) continue;
+    const hit=manual.find(l=>{ if(l.cardId!==r.cardId) return false; const dd=Math.abs((new Date(l.day||l.date)-new Date(r.date))/864e5); if(dd>1.5) return false;
+      const m=/^([A-Z]{3})\s([\d,]+(?:\.\d+)?)/.exec(l.memo||""); if(m&&m[1]===r.cur) return Math.abs(parseFloat(m[2].replace(/,/g,""))-Math.abs(r.amt))<0.01;
+      return Math.abs((l.amount||0)-Math.abs(r.hkd))<=Math.max(1,Math.abs(r.hkd)*0.01); });
+    if(hit){ r.status="dup-manual"; r.detail=`你已手動記過（${hit.memo||hit.cardName}），略過`; }
+  }
+  computeEngine(); renderRates(); renderReview(); renderLedger(); $("#generate").disabled=false;
+}
+function baseRate(cardId,sc){ return S.appData?.cardData.cardPromos[cardId]?.cashback?.[sc]??0; }
+// rate priority (mirrors planto2sw.py rate_for): channel rule > your override > engine
+function rowRate(r){
+  const cr=channelRule(r);
+  if(cr) return [cr.rate==="base"?baseRate(r.cardId,r.scenario):cr.rate==="no-bonus"?(r.engRate??baseRate(r.cardId,r.scenario)):cr.rate,cr.note];
+  const k=r.cardId+"|"+r.scenario;
+  if(S.rates[k]?.user!=null) return [S.rates[k].user,"你改嘅值"];
+  return [r.engRate??baseRate(r.cardId,r.scenario),"引擎"];
+}
+function refreshRates(){ computeEngine(); renderRates(); renderLedger(); }
+const fmtRate = x => (Math.round(x*1e6)/1e6).toString();
+function renderRates(){
+  if(!S.appData||!S.rows.length) return;
+  const agg={}; S.rows.filter(r=>r.status==="ok"&&r.include).forEach(r=>{const k=r.cardId+"|"+r.scenario; agg[k]=agg[k]||{n:0,hkd:0,eng:new Set(),ch:new Set(),chN:0}; agg[k].n++; agg[k].hkd+=rowHkd(r); if(channelRule(r)){ agg[k].ch.add(rowRate(r)[0]); agg[k].chN++; } else agg[k].eng.add(r.engRate??0);});
+  const span=s=>{ const a=[...s].sort((x,y)=>x-y); return a.length===1?fmtRate(a[0]):`${fmtRate(a[0])}–${fmtRate(a[a.length-1])}（按筆）`; };
+  $("#rates tbody").innerHTML=Object.entries(agg).sort().map(([k,v])=>{ const [c,sc]=k.split("|"); const e=[...v.eng].sort((a,b)=>a-b);
+    // channel-rule rows keep their own rate whatever the engine or your override says, so show them next to the engine rate
+    const engTxt=e.length===0?`${span(v.ch)}（通道規則）`:v.chN?`${span(v.eng)}（另 ${v.chN} 筆通道規則 ${span(v.ch)}）`:span(v.eng);
+    const user=S.rates[k]?.user; const learned=S.learned[k];
+    let src=e.length===0?["通道規則",""]:user!=null?["你改嘅值","ok"]:learned!=null&&Math.abs(learned-e[e.length-1])>1e-9?[`引擎（你手動記過 ${fmtRate(learned)}，檢查第 2 步設定）`,"warn"]:["引擎",""];
+    if(e.length&&v.chN) src=[`${src[0]}＋通道規則（${v.chN} 筆）`,src[1]];
+    return `<tr><td>${esc(CARD_BY_ID[c]?.name||c)}</td><td>${SC_LABEL[sc]||sc} <span class="tag">${sc}</span></td><td class="num">${v.n}</td><td class="num">${fmt(v.hkd)}</td><td>${engTxt} <input type="number" step="0.001" min="0" data-rate="${k}" value="${user??""}" placeholder="覆蓋" style="width:80px"></td><td><span class="tag ${src[1]}">${src[0]}</span></td></tr>`; }).join("");
+  $("#rates").querySelectorAll("input").forEach(i=>i.oninput=()=>{ const v=parseFloat(i.value); if(Number.isFinite(v)) S.rates[i.dataset.rate]={user:v}; else delete S.rates[i.dataset.rate]; lsSet("p2s_rates",S.rates); renderLedger(); });
+}
+function renderReview(){
+  const show=$("#showExcluded").checked, onlyNew=$("#onlyNew").checked;
+  const existingIds=new Set((S.sw?.logs||[]).map(l=>l.id));
+  const scOpts=SCENARIOS.map(s=>`<option value="${s}">${SC_LABEL[s]||s}</option>`).join("");
+  const rows=S.rows.filter(r=>(show||r.status==="ok")&&(!onlyNew||!existingIds.has(r.id)));
+  $("#review tbody").innerHTML=rows.map(r=>{ const ok=r.status==="ok"; const cls=ok?"":"excluded"; const sign=r.neg?-1:1;
+    return `<tr class="${cls}"><td>${r.date}${existingIds.has(r.id)?' <span class="tag">已有</span>':""}</td><td>${esc(CARD_BY_ID[r.cardId]?.name||r.acct)}</td><td>${esc(r.desc)}</td><td class="num">${r.cur} ${fmt(sign*Math.abs(r.amt))}</td><td class="num">${fmt(sign*Math.abs(r.hkd))}</td><td>${ok?`<select data-row="${r.row}">${scOpts}</select>`:""}</td><td class="small">${ok?`${esc(r.layer)} <label><input type="checkbox" data-inc="${r.row}" ${r.include?"checked":""}>匯入</label>`:esc(r.detail)}</td></tr>`; }).join("");
+  $("#review").querySelectorAll("select").forEach(s=>{ const r=S.rows.find(x=>x.row==s.dataset.row); s.value=r.scenario; s.onchange=()=>{r.scenario=s.value;r.userSet=true;r.layer="手動改";refreshRates();}; });
+  $("#review").querySelectorAll("[data-inc]").forEach(c=>c.onchange=()=>{ S.rows.find(x=>x.row==c.dataset.inc).include=c.checked; refreshRates(); });
+  const st={}; S.rows.forEach(r=>st[r.status]=(st[r.status]||0)+1);
+  const neg=S.rows.filter(r=>r.status==="ok"&&r.neg).length;
+  $("#reviewSummary").textContent=`會匯入 ${st.ok||0} 筆（其中退款未配對寫負數 ${neg}）｜略過：還款等 ${st.excluded||0}、未對應 ${st["no-card"]||0}、退款配對 ${st.refund||0}、其他入賬 ${st.credit||0}、已手動記過 ${st["dup-manual"]||0}、碌邊張已有且場景不同 ${st.kept||0}`;
+}
+$("#showExcluded").onchange=renderReview; $("#onlyNew").onchange=renderReview;
+$("#guruTopCard").checked=GURU_MONTHLY_TOP_CARD;   // the constant is the source of truth; never hard-code checked in the markup
+$("#guruTopCard").onchange=e=>{ S.opts.guruTopCard=e.target.checked; if(S.rows.length&&S.appData) refreshRates(); };
+function renderLedger(){
+  if(!S.rows.length){return;}
+  const agg={}; let tS=0,tR=0;
+  S.rows.filter(r=>r.status==="ok"&&r.include).forEach(r=>{ const [rate]=rowRate(r); const k=r.cardId+"|"+r.scenario; agg[k]=agg[k]||{s:0,rb:0}; agg[k].s+=rowHkd(r); agg[k].rb+=rowHkd(r)*rate; });
+  let html="", last="";
+  for(const [k,v] of Object.entries(agg).sort()){ const [c,sc]=k.split("|"); if(c!==last){html+=`<tr><td colspan="3" style="padding-top:10px;font-weight:600">${esc(CARD_BY_ID[c]?.name||c)}</td></tr>`;last=c;} html+=`<tr><td style="padding-left:14px">${SC_LABEL[sc]||sc}</td><td class="num">${fmt(v.s)}</td><td class="num">${fmt(v.rb)}</td></tr>`; tS+=v.s; tR+=v.rb; }
+  html+=`<tr class="total"><td>合計</td><td class="num">${fmt(tS)}</td><td class="num">${fmt(tR)}</td></tr>`;
+  $("#ledger tbody").innerHTML=`<tr><th></th><th class="num">簽賬 HK$</th><th class="num">回贈 HK$</th></tr>`+html;
+  $("#ledgerHint").style.display="none";
+}
+
+// ---------------------------------------------------------------- step 5
+async function buildLogs(){
+  const now=Date.now(), out=[];
+  for(const r of S.rows.filter(r=>r.status==="ok"&&r.include)){
+    const [rate]=rowRate(r);
+    const hkd=rowHkd(r);
+    const merchant=r.merchant||r.desc;
+    let memo=r.cur!=="HKD"?`${r.cur} ${fmt(Math.abs(r.amt))} · ${merchant}`:merchant;
+    memo+=" "+AUTO_TAG;
+    out.push({u:now,id:r.id??await detId(r.acct,r.date,r.amtRaw,r.cur,r.desc),day:r.date,date:`${r.date}T04:00:00.000Z`,memo,rate,miles:0,amount:hkd,cardId:r.cardId,rebate:Math.round(hkd*rate*10000)/10000,isMiles:false,cardName:CARD_BY_ID[r.cardId]?.name||r.cardId,scenario:r.scenario});
+  }
+  return out;
+}
+$("#generate").onclick=async()=>{
+  if(!S.existing&&!confirm("第 1 步未貼現有轉移碼。咁樣生成嘅備份冇你喺碌邊張裡嘅卡片日子（到期日、結單日、年費）、登記、簽滿賞等設定，匯入會將佢哋全部清空。\n\n建議先去碌邊張 設定 → 匯出備份 → 複製轉移碼，貼返第 1 步。仍要繼續？")) return;
+  const logs=await buildLogs(); S.logs=logs;
+  const outer=S.existing?JSON.parse(JSON.stringify(S.existing)):{v:1,app:"swipewhich",ts:0,data:{sw_data:emptySw(),sw_lang:"zh",sw_dark:"auto"}};
+  const sw=outer.data.sw_data; const byId=new Map((sw.logs||[]).map(l=>[l.id,l])); let added=0, refreshed=0;
+  const refresh=$("#refreshRates").checked;
+  for(const l of logs){ const old=byId.get(l.id);
+    if(!old){byId.set(l.id,l);added++;}
+    else if(refresh&&old.scenario===l.scenario&&old.rate!==l.rate){ old.rate=l.rate; old.rebate=Math.round((old.amount||0)*l.rate*10000)/10000; old.u=Date.now(); refreshed++; } }   // mirrors CLI --refresh-rates
+  sw.logs=[...byId.values()].sort((a,b)=>(a.day||"").localeCompare(b.day||"")||(a.id-b.id));
+  sw.own=[...new Set([...(sw.own||[]),...logs.map(l=>l.cardId)])].sort();
+  Object.assign(sw,S.settings); sw._v=sw._v??12; sw._su=Date.now(); outer.ts=Date.now();
+  const o=JSON.parse(JSON.stringify(outer)); o.data.sw_data=JSON.stringify(sw); if(typeof o.data.sw_ui==="object"&&o.data.sw_ui) o.data.sw_ui=JSON.stringify(o.data.sw_ui);
+  const text=JSON.stringify(o); const code="SW1."+b64utf8(text);
+  $("#code").value=code; S.outText=text; S.outCode=code;
+  $("#genMsg").innerHTML=`<div class="msg ok">已生成：新增 ${added} 筆${refresh?`，重寫費率 ${refreshed} 筆`:""}，備份合共 ${sw.logs.length} 筆記賬；轉移碼 ${code.length.toLocaleString()} 字元。優惠設定已寫入。</div>`;
+  ["#copyCode","#dlJson","#dlReview"].forEach(s=>$(s).disabled=false);
+};
+$("#copyCode").onclick=async()=>{ try{await navigator.clipboard.writeText(S.outCode);$("#genMsg").innerHTML='<div class="msg ok">已複製轉移碼。</div>';}catch{ $("#code").select(); document.execCommand("copy"); } };
+function dl(name,content,type){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([content],{type})); a.download=name; a.click(); }
+$("#dlJson").onclick=()=>dl(`swipewhich-backup-${new Date().toISOString().slice(0,10)}.json`,S.outText,"application/json");
+$("#dlReview").onclick=()=>{ const h=["row","date","account","cardId","desc","amount","cur","hkd","status","scenario","layer","include"]; const csv="\uFEFF"+[h.join(",")].concat(S.rows.map(r=>h.map(k=>`"${String(r[k]??"").replace(/"/g,'""')}"`).join(","))).join("\n"); dl("review.csv",csv,"text/csv"); };
+
+// init
+{ const a=$("#appdataLink"); a.href=APP_DATA_URL; a.textContent=APP_DATA_URL; }   // link only; the URL is fetched solely when the user clicks 一鍵攞最新
+S.rates=lsGet("p2s_rates",{});
+{ const saved=lsGet("p2s_rules",""); $("#customRules").value=saved; S.customRules=parseCustomRules(saved).rules; }
+$("#customRules").addEventListener("input",e=>{ const {rules,bad}=parseCustomRules(e.target.value); S.customRules=rules; lsSet("p2s_rules",e.target.value);
+  $("#customRulesMsg").textContent=bad.length?`有 ${bad.length} 行格式唔啱，略過：${bad.join("｜")}`:`${rules.length} 條生效`;
+  if(S.rows.length&&S.appData) buildAll(); });
+S.sw=emptySw(); fillSettings();
+restoreAppData();
+</script>
+</body>
+</html>

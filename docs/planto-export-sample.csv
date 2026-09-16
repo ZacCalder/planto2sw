@@ -1,0 +1,9 @@
+Merchant Name,Description,Original Description,Category,Amount,Currency,Amount in HKD,User Notes,Bank Name,Account Name,Transaction Date
+Noodle Shop,Noodle Shop,APPLEPAY DEMO NOODLE SHOP          CHN          CN,Eating Out,-68.0,CNY,-78.88,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-07-06
+,QR UNIONPAY MERCHANT CHN CN,QR       UNIONPAY MERCHANT         CHN          CN,Travel,-150.0,CNY,-174.0,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-07-09
+,SALES: tencent CHN CN,SALES:   tencent                   CHN          CN,Travel,-40.0,CNY,-46.4,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-08-26
+,RETURN: DEMO MART CHN CN,RETURN:  DEMO MART                 CHN          CN,Internal_Transfers,50.0,CNY,58.0,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-08-21
+,PAYMENT - THANK YOU,PAYMENT - THANK YOU,Internal_Transfers,5000.0,HKD,5000.0,,HSBC,HSBC EveryMile Card,2026-09-02
+,FINANCE CHARGE,FINANCE CHARGE,Bills,-50.0,HKD,-50.0,,HSBC,HSBC Red Credit Card,2026-08-22
+,SALES: NETFLIX.COM LOS GATOS US,SALES:   NETFLIX.COM               LOS GATOS    US,Entertainment,-10.0,USD,-78.0,,HSBC,HSBC Red Credit Card,2026-07-15
+,LAST STATEMENT MONTHLY CASH REBATE,LAST STATEMENT MONTHLY CASH REBATE,Income,12.0,HKD,12.0,,Citic Bank,CNCBI GBA Dual Currency Credit Card (-1234; HKD),2026-06-15

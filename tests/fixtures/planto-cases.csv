@@ -1,0 +1,33 @@
+Merchant Name,Description,Original Description,Category,Amount,Currency,Amount in HKD,User Notes,Bank Name,Account Name,Transaction Date
+Noodle Shop,Noodle Shop,APPLEPAY DEMO NOODLE SHOP          CHN          CN,Eating Out,-68.0,CNY,-78.88,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-07-06
+,QR UNIONPAY MERCHANT CHN CN,QR       UNIONPAY MERCHANT         CHN          CN,Travel,-150.0,CNY,-174.0,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-07-09
+,SALES: tencent CHN CN,SALES:   tencent                   CHN          CN,Travel,-40.0,CNY,-46.4,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-08-26
+,SALES: DEMO MART CHN CN,SALES:   DEMO MART                 CHN          CN,Shopping,-288.0,CNY,-334.08,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-08-14
+,RETURN: DEMO MART CHN CN,RETURN:  DEMO MART                 CHN          CN,Internal_Transfers,288.0,CNY,334.08,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-08-19
+,RETURN: DEMO MART CHN CN,RETURN:  DEMO MART                 CHN          CN,Internal_Transfers,50.0,CNY,58.0,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-08-21
+,PAYMENT - THANK YOU,PAYMENT - THANK YOU,Internal_Transfers,5000.0,HKD,5000.0,,HSBC,HSBC EveryMile Card,2026-09-02
+,FINANCE CHARGE,FINANCE CHARGE,Bills,-50.0,HKD,-50.0,,HSBC,HSBC Red Credit Card,2026-08-22
+,SALES: NETFLIX.COM LOS GATOS US,SALES:   NETFLIX.COM               LOS GATOS    US,Entertainment,-10.0,USD,-78.0,,HSBC,HSBC Red Credit Card,2026-07-15
+,LAST STATEMENT MONTHLY CASH REBATE,LAST STATEMENT MONTHLY CASH REBATE,Income,12.0,HKD,12.0,,Citic Bank,CNCBI GBA Dual Currency Credit Card (-1234; HKD),2026-06-15
+"Sushiro, Causeway Bay",Sushiro,SALES:   SUSHIRO CAUSEWAY BAY      HONG KONG    HK,Eating Out,-256.0,HKD,-256.0,,HSBC,HSBC Red Credit Card,2026-08-03
+,MTR,APPLEPAY MTR                       HONG KONG    HK,Transport,-12.5,HKD,-12.5,,HSBC,HSBC Red Credit Card,2026-08-04
+,WELLCOME,SALES:   WELLCOME 0123           HONG KONG    HK,Groceries,-188.4,HKD,-188.4,,HSBC,HSBC Visa Signature Card,2026-08-05
+,DEMO CLINIC,SALES:   DEMO CLINIC              HONG KONG    HK,Travel,-1500.0,HKD,-1500.0,,HSBC,HSBC EveryMile Card,2026-08-06
+,Amazon,SALES:   AMAZON.CO.JP              TOKYO        JP,Shopping,-3200.0,JPY,-160.0,,HSBC,HSBC EveryMile Card,2026-08-07
+,Demo Konbini,SALES:   DEMO KONBINI              TOKYO        JP,Shopping,-980.0,JPY,-49.0,,HSBC,HSBC EveryMile Card,2026-08-08
+,PARKNSHOP,APPLEPAY PARKNSHOP                 HONG KONG    HK,Groceries,-99.9,HKD,-99.9,,HSBC,HSBC Gold Credit Card,2026-08-09
+,Some Shop,SALES:   SOME SHOP 5            HONG KONG    HK,Shopping,-33.33,HKD,-33.33,,HSBC,HSBC Premier Credit Card,2026-08-10
+,,,Shopping,-0.5,HKD,-0.5,,HSBC,HSBC Premier Credit Card,2026-08-11
+,Deposit,DEPOSIT,Income,100.0,HKD,100.0,,HSBC,HSBC One Savings,2026-08-12
+,Half,SALES:   ODD ROUNDING 1 HONG KONG HK,Shopping,-1.125,HKD,-1.125,,HSBC,HSBC Red Credit Card,2026-08-13
+,Demo,SALES:   tencent DEMO            CHN          CN,Travel,-1234.56,CNY,-1432.09,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-09-10
+,Big Spend,APPLEPAY BIG SPEND SHOP          CHN          CN,Shopping,-40000.0,CNY,-46400.0,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-08-30
+,Wellcome,APPLEPAY WELLCOME 123              HONG KONG    HK,Groceries,-88.0,HKD,-88.0,,HSBC,HSBC Pulse Dual Currency Diamond Card - HKD,2026-08-16
+,Taobao,SALES:   TAOBAO MERCHANT           HANGZHOU     CN,Shopping,-120.0,CNY,-139.2,,Citic Bank,CNCBI GBA Dual Currency Credit Card (-1234; CNY),2026-08-17
+,Eleme,SALES:   ELEME PLATFORM MERCHANT   SHANGHAI     CN,Eating Out,-30.0,CNY,-34.8,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-08-18
+,Demo Ride,SALES:   DEMO RIDE HAILING         BEIJING      CN,Transport,-25.0,CNY,-29.0,,HSBC,HSBC Pulse Dual Currency Diamond Card - RMB,2026-08-19
+,Payment reversal,PAYMENT REVERSAL,Internal_Transfers,-500.0,HKD,-500.0,,HSBC,HSBC Red Credit Card,2026-08-21
+,Late charge,LATE CHARGE,Bills,-150.0,HKD,-150.0,,HSBC,HSBC Red Credit Card,2026-08-22
+,Late charge rev,LATE CHARGE REV,Bills,150.0,HKD,150.0,,HSBC,HSBC Red Credit Card,2026-08-23
+,iBanking,IBANKING PAYMENT,Internal_Transfers,2000.0,HKD,2000.0,,HSBC,HSBC Red Credit Card,2026-08-24
+,Interest,INTEREST CHARGE,Bills,-12.5,HKD,-12.5,,HSBC,HSBC Red Credit Card,2026-08-25

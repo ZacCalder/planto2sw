@@ -1,0 +1,198 @@
+{
+  "card_map": {
+    "^CNCBI GBA.*Card": "cncbi_gba",
+    "^CNCBI JD.*Card": "cncbi_jd",
+    "^CNCBI Motion.*Card": "cncbi_motion",
+    "^HSBC easy.*Card": "hsbc_easy",
+    "^HSBC EveryMile.*Card": "hsbc_everymile",
+    "^HSBC Gold.*Card": "hsbc_gold",
+    "^HSBC Platinum.*Card": "hsbc_plat",
+    "^HSBC Premier.*Card": "hsbc_premier",
+    "^HSBC Pulse.*Card": "hsbc_pulse",
+    "^HSBC Red.*Card": "hsbc_red",
+    "^HSBC Student.*Card": "hsbc_student",
+    "^HSBC Visa Signature.*Card": "hsbc_vs"
+  },
+  "card_names": {
+    "cncbi_gba": "信銀國際大灣區卡",
+    "cncbi_jd": "信銀國際 京東",
+    "cncbi_motion": "信銀國際 Motion",
+    "hsbc_easy": "HSBC easy 卡",
+    "hsbc_everymile": "HSBC EveryMile",
+    "hsbc_gold": "HSBC 金卡",
+    "hsbc_plat": "HSBC Visa 白金卡",
+    "hsbc_premier": "HSBC Premier MC",
+    "hsbc_pulse": "HSBC 銀聯 Pulse",
+    "hsbc_red": "HSBC Red",
+    "hsbc_student": "HSBC 學生卡",
+    "hsbc_vs": "HSBC Visa Signature"
+  },
+  "exclude_patterns": [
+    "^PAYMENT\\s*-?\\s*THANK YOU",
+    "^PAYMENT REVERSAL",
+    "FINANCE CHARGE",
+    "LATE CHARGE",
+    "^IBANKING PAYMENT",
+    "MONTHLY CASH REBATE",
+    "^INTEREST"
+  ],
+  "refund_window_days": 90,
+  "merchant_alias_stop": [
+    "aberdeen",
+    "admiralty",
+    "bakery",
+    "bangkok",
+    "beijing",
+    "cafe",
+    "card",
+    "causeway",
+    "center",
+    "central",
+    "centre",
+    "cheung",
+    "china",
+    "chung",
+    "cinema",
+    "city",
+    "club",
+    "coffee",
+    "cotai",
+    "dining",
+    "express",
+    "fanling",
+    "fitness",
+    "food",
+    "garden",
+    "group",
+    "guangzhou",
+    "home",
+    "hong",
+    "hotel",
+    "house",
+    "international",
+    "japan",
+    "jordan",
+    "kennedy",
+    "kitchen",
+    "kong",
+    "korea",
+    "kowloon",
+    "kwai",
+    "kwun",
+    "lantau",
+    "limited",
+    "living",
+    "london",
+    "macao",
+    "macau",
+    "mall",
+    "market",
+    "mong",
+    "music",
+    "online",
+    "plaza",
+    "pokfulam",
+    "quarry",
+    "rent",
+    "restaurant",
+    "seoul",
+    "shanghai",
+    "shatin",
+    "shenzhen",
+    "sheung",
+    "shop",
+    "shui",
+    "singapore",
+    "stanley",
+    "store",
+    "taikoo",
+    "taipa",
+    "taipei",
+    "taiwan",
+    "tokyo",
+    "tong",
+    "town",
+    "travel",
+    "tseung",
+    "tsim",
+    "tsuen",
+    "tsui",
+    "tuen",
+    "wanchai",
+    "wine",
+    "yuen",
+    "zhuhai"
+  ],
+  "merchant_rules": {
+    "\\bMTR\\b": "transport",
+    "netflix|spotify|disney|apple\\.com": "onlineFX"
+  },
+  "prefix_rules": {
+    "^APPLEPAY": "mobilePay",
+    "^QR ": "mobilePay"
+  },
+  "online_hints": [
+    "netflix",
+    "spotify",
+    "disney",
+    "apple.com",
+    "amazon",
+    "order ",
+    ".com"
+  ],
+  "fx_default": "physicalFX",
+  "local_default": "local",
+  "scenario_fallback": {
+    "mobilePay": [
+      "local"
+    ],
+    "transport": [
+      "local"
+    ],
+    "medical": [
+      "local"
+    ],
+    "travelCN": [
+      "physicalFX",
+      "local"
+    ],
+    "onlineFX": [
+      "physicalFX",
+      "local"
+    ],
+    "physicalFX": [
+      "onlineFX",
+      "local"
+    ]
+  },
+  "guru_monthly_top_card": false,
+  "_guru_monthly_top_card_note": "false = Travel Guru pools all eligible HSBC cards' FX spend, per HSBC T&C clause 9c (corrected 2026-09-12, see decisions 19). true = only the month's highest-FX-spend card earns; this was a misreading of clause 9d, which governs which account the extra RewardCash is credited to. Kept switchable only to reproduce the old behaviour. Mirrors index.html GURU_MONTHLY_TOP_CARD.",
+  "channel_rules": [
+    {
+      "cardId": "hsbc_pulse",
+      "scenario": "travelCN",
+      "pattern": "^SALES:|tencent|wechat|weixin|taobao|eleme|alipay|zhifubao",
+      "rate": "no-bonus",
+      "note": "網上卡號／微信／支付寶：無 Pulse +2%、無最紅自主，Travel Guru 照計（Pulse 條款：+2% 只限 Reward+／雲閃付掃碼或 Apple/Google/Samsung Pay）"
+    }
+  ],
+  "rate_overrides": {
+    "_comment": "cardId -> scenario -> effective rate, e.g. {\"hsbc_pulse\": {\"travelCN\": 0.104}}. Priority: channel_rules > rate_overrides > engine. channel_rules.rate: \"base\" = app-data base rate only; \"no-bonus\" = engine with pulseReg=false and 最紅自主=0 (Guru still applies); or a number."
+  },
+  "rewardcash_map": {
+    "_comment": "Planto account_export 裡 RewardCash (-***…NNN-NNNN) 的尾碼 -> 碌邊張 cardId，供 rewardcash_recon.py 對賬，例：\"123-4567\": \"hsbc_red\"。雙幣卡有兩個戶口（HKD 側和 CNY 側）都指向同一張卡。"
+  },
+  "settings": {
+    "_comment": "Card option / registration flags. Planto has none of this; declare it here and it is written into sw_data before emit. Keys mirror SwipeWhich's own: *Reg toggles, vs (最紅自主: world/savour/home/lifestyle/shopping = 0|1), guru (none|...), hsbcDining, scSmartTier, promoRegs, milestoneEnroll, mileValue, mode. Copy this file to config.json and add your own vs / guru / guruStartDate / rewardcash_map.",
+    "pulseReg": true,
+    "everyMileReg": true,
+    "aeExplorerReg": true,
+    "aeChargeReg": true,
+    "mmpowerReg": true,
+    "travelPlusReg": true,
+    "dbsEminentReg": true,
+    "beaWorldReg": true,
+    "ccbEyeReg": true,
+    "wewaQ3Reg": true
+  }
+}

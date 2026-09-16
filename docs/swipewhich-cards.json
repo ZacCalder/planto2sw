@@ -1,0 +1,639 @@
+[
+{
+"id": "aeon_premium",
+"name": "AEON Premium（黑卡）",
+"issuer": "AEON",
+"type": "cashback",
+"net": "銀聯"
+},
+{
+"id": "aeon_purple_jcb",
+"name": "AEON Purple（JCB）",
+"issuer": "AEON",
+"type": "cashback",
+"net": "JCB"
+},
+{
+"id": "aeon_purple_vs",
+"name": "AEON Purple（Visa）",
+"issuer": "AEON",
+"type": "both",
+"net": "Visa"
+},
+{
+"id": "aeon_purple_mc",
+"name": "AEON Purple（萬事達）",
+"issuer": "AEON",
+"type": "both",
+"net": "Mastercard"
+},
+{
+"id": "aeon_purple_up",
+"name": "AEON Purple（銀聯）",
+"issuer": "AEON",
+"type": "both",
+"net": "銀聯"
+},
+{
+"id": "aeon_waku",
+"name": "AEON WAKUWAKU",
+"issuer": "AEON",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "aeon_basic",
+"name": "AEON 信用卡",
+"issuer": "AEON",
+"type": "cashback",
+"net": "Visa / MC / 銀聯 / JCB"
+},
+{
+"id": "ae_blue",
+"name": "AE Blue Cash",
+"issuer": "American Express",
+"type": "cashback",
+"net": "Amex"
+},
+{
+"id": "ae_explorer",
+"name": "AE Explorer",
+"issuer": "American Express",
+"type": "miles",
+"net": "Amex"
+},
+{
+"id": "ae_plat_cc",
+"name": "AE 白金信用卡",
+"issuer": "American Express",
+"type": "miles",
+"net": "Amex"
+},
+{
+"id": "ae_plat_charge",
+"name": "AE 白金卡（鋼卡/細頭）",
+"issuer": "American Express",
+"type": "miles",
+"net": "Amex"
+},
+{
+"id": "bea_goal",
+"name": "BEA GOAL",
+"issuer": "BEA",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "bea_jcb",
+"name": "BEA JCB 白金卡",
+"issuer": "BEA",
+"type": "cashback",
+"net": "JCB"
+},
+{
+"id": "bea_sup",
+"name": "BEA SupremeGold",
+"issuer": "BEA",
+"type": "both",
+"net": "Mastercard"
+},
+{
+"id": "bea_vs",
+"name": "BEA Visa Signature",
+"issuer": "BEA",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "bea_world",
+"name": "BEA World MC",
+"issuer": "BEA",
+"type": "both",
+"net": "Mastercard"
+},
+{
+"id": "bea_ititan",
+"name": "BEA i-Titanium",
+"issuer": "BEA",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "bea_uni",
+"name": "BEA 大學/大專卡",
+"issuer": "BEA",
+"type": "cashback",
+"net": "Visa / Mastercard"
+},
+{
+"id": "bea_diamond",
+"name": "BEA 銀聯雙幣鑽石",
+"issuer": "BEA",
+"type": "cashback",
+"net": "銀聯"
+},
+{
+"id": "boc_bliss",
+"name": "中銀 Bliss Card",
+"issuer": "Bank of China",
+"type": "both",
+"net": "Visa Infinite"
+},
+{
+"id": "boc_cheers",
+"name": "中銀 Cheers VI",
+"issuer": "Bank of China",
+"type": "both",
+"net": "Visa"
+},
+{
+"id": "boc_cheers_vs",
+"name": "中銀 Cheers VS",
+"issuer": "Bank of China",
+"type": "both",
+"net": "Visa"
+},
+{
+"id": "boc_chill_plat",
+"name": "中銀 Chill Platinum",
+"issuer": "Bank of China",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "boc_chill",
+"name": "中銀 Chill World",
+"issuer": "Bank of China",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "boc_go",
+"name": "中銀 Go 卡",
+"issuer": "Bank of China",
+"type": "cashback",
+"net": "銀聯"
+},
+{
+"id": "boc_sogo",
+"name": "中銀 SOGO Visa Sig",
+"issuer": "Bank of China",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "boc_uni",
+"name": "中銀大學信用卡",
+"issuer": "Bank of China",
+"type": "cashback",
+"net": "Visa / 銀聯"
+},
+{
+"id": "boc_gbayouth",
+"name": "中銀大灣區青年卡",
+"issuer": "Bank of China",
+"type": "cashback",
+"net": "銀聯"
+},
+{
+"id": "boc_taobao",
+"name": "中銀淘寶卡",
+"issuer": "Bank of China",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "bocom_gogoal",
+"name": "交通銀行 Go-Goal",
+"issuer": "BoCom",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "ccb_travo",
+"name": "建行 TRAVO MC",
+"issuer": "CCB Asia",
+"type": "both",
+"net": "Mastercard"
+},
+{
+"id": "ccb_eye",
+"name": "建行 eye Visa Sig",
+"issuer": "CCB Asia",
+"type": "both",
+"net": "Visa"
+},
+{
+"id": "cncbi_motion",
+"name": "信銀國際 Motion",
+"issuer": "CNCBI",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "cncbi_jd",
+"name": "信銀國際 京東",
+"issuer": "CNCBI",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "cncbi_gba",
+"name": "信銀國際大灣區卡",
+"issuer": "CNCBI",
+"type": "cashback",
+"net": "銀聯"
+},
+{
+"id": "citi_cashback",
+"name": "Citi Cash Back",
+"issuer": "Citibank",
+"type": "cashback",
+"net": "Visa / Mastercard"
+},
+{
+"id": "citi_hktv",
+"name": "Citi HKTVMALL",
+"issuer": "Citibank",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "citi_octopus",
+"name": "Citi Octopus",
+"issuer": "Citibank",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "citi_plus",
+"name": "Citi Plus 信用卡",
+"issuer": "Citibank",
+"type": "both",
+"net": null
+},
+{
+"id": "citi_pm",
+"name": "Citi PremierMiles",
+"issuer": "Citibank",
+"type": "miles",
+"net": "Mastercard"
+},
+{
+"id": "citi_prestige",
+"name": "Citi Prestige",
+"issuer": "Citibank",
+"type": "miles",
+"net": "Mastercard"
+},
+{
+"id": "citi_rewards_m",
+"name": "Citi Rewards",
+"issuer": "Citibank",
+"type": "both",
+"net": "Mastercard"
+},
+{
+"id": "citi_club",
+"name": "Citi The Club",
+"issuer": "Citibank",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "citi_ultima",
+"name": "Citi ULTIMA",
+"issuer": "Citibank",
+"type": "miles",
+"net": "Mastercard"
+},
+{
+"id": "dbs_black",
+"name": "DBS Black World MC",
+"issuer": "DBS",
+"type": "miles",
+"net": "Mastercard"
+},
+{
+"id": "dbs_compass",
+"name": "DBS Compass Visa",
+"issuer": "DBS",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "dbs_eminent_vs",
+"name": "DBS Eminent VS",
+"issuer": "DBS",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "dbs_eminent_plat",
+"name": "DBS Eminent 白金",
+"issuer": "DBS",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "dbs_live",
+"name": "DBS Live Fresh",
+"issuer": "DBS",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "ds_ana",
+"name": "大新 ANA World MC",
+"issuer": "Dah Sing",
+"type": "miles",
+"net": "Mastercard"
+},
+{
+"id": "ds_kitty",
+"name": "大新 Hello Kitty 白金卡",
+"issuer": "Dah Sing",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "ds_myauto",
+"name": "大新 MyAuto 車主卡",
+"issuer": "Dah Sing",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "ds_oneplus",
+"name": "大新 ONE+",
+"issuer": "Dah Sing",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "ds_ba",
+"name": "大新英國航空白金卡",
+"issuer": "Dah Sing",
+"type": "miles",
+"net": "Visa"
+},
+{
+"id": "fubon_infinite",
+"name": "富邦 Visa Infinite",
+"issuer": "Fubon",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "fubon_plat",
+"name": "富邦 Visa 白金卡",
+"issuer": "Fubon",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "fubon_insb",
+"name": "富邦 iN ShopBack Visa白金卡",
+"issuer": "Fubon",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "fubon_in",
+"name": "富邦 iN Visa 白金卡",
+"issuer": "Fubon",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "hsbc_everymile",
+"name": "HSBC EveryMile",
+"issuer": "HSBC",
+"type": "miles",
+"net": "Visa"
+},
+{
+"id": "hsbc_debit",
+"name": "HSBC MC 扣賬卡",
+"issuer": "HSBC",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "hsbc_premier",
+"name": "HSBC Premier MC",
+"issuer": "HSBC",
+"type": "both",
+"net": "Mastercard"
+},
+{
+"id": "hsbc_red",
+"name": "HSBC Red",
+"issuer": "HSBC",
+"type": "both",
+"net": "Mastercard"
+},
+{
+"id": "hsbc_vs",
+"name": "HSBC Visa Signature",
+"issuer": "HSBC",
+"type": "both",
+"net": "Visa"
+},
+{
+"id": "hsbc_plat",
+"name": "HSBC Visa 白金卡",
+"issuer": "HSBC",
+"type": "both",
+"net": "Visa"
+},
+{
+"id": "hsbc_easy",
+"name": "HSBC easy 卡",
+"issuer": "HSBC",
+"type": "both",
+"net": "Visa"
+},
+{
+"id": "hsbc_student",
+"name": "HSBC 學生卡",
+"issuer": "HSBC",
+"type": "both",
+"net": "Visa"
+},
+{
+"id": "hsbc_gold",
+"name": "HSBC 金卡",
+"issuer": "HSBC",
+"type": "both",
+"net": "Visa / Mastercard"
+},
+{
+"id": "hsbc_pulse",
+"name": "HSBC 銀聯 Pulse",
+"issuer": "HSBC",
+"type": "both",
+"net": "銀聯"
+},
+{
+"id": "hs_mmpower",
+"name": "恒生 MMPOWER",
+"issuer": "Hang Seng",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "hs_muji",
+"name": "恒生 Muji 卡",
+"issuer": "Hang Seng",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "hs_prestige",
+"name": "恒生 Prestige World MC",
+"issuer": "Hang Seng",
+"type": "both",
+"net": "Mastercard"
+},
+{
+"id": "hs_travel",
+"name": "恒生 Travel+",
+"issuer": "Hang Seng",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "hs_enjoy",
+"name": "恒生 enJoy 卡",
+"issuer": "Hang Seng",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "hs_uni",
+"name": "恒生大學/大專卡",
+"issuer": "Hang Seng",
+"type": "cashback",
+"net": "Visa / Mastercard"
+},
+{
+"id": "icbc_star",
+"name": "工銀宇宙星座卡",
+"issuer": "ICBC Asia",
+"type": "cashback",
+"net": "Visa / 銀聯"
+},
+{
+"id": "icbc_gba",
+"name": "工銀粵港澳灣區銀聯鑽石",
+"issuer": "ICBC Asia",
+"type": "cashback",
+"net": "銀聯"
+},
+{
+"id": "mox_miles",
+"name": "MOX（Asia Miles）",
+"issuer": "Mox Bank",
+"type": "miles",
+"net": "Mastercard"
+},
+{
+"id": "mox_cb",
+"name": "MOX（CashBack）",
+"issuer": "Mox Bank",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "sc_apoint",
+"name": "渣打 A. Point Card",
+"issuer": "Standard Chartered",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "sc_simply",
+"name": "渣打 Simply Cash",
+"issuer": "Standard Chartered",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "sc_smart",
+"name": "渣打 Smart 卡",
+"issuer": "Standard Chartered",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "sc_cathay_pb",
+"name": "渣打國泰-優先理財（藍卡）",
+"issuer": "Standard Chartered",
+"type": "miles",
+"net": "Mastercard"
+},
+{
+"id": "sc_cathay_pp",
+"name": "渣打國泰-私人理財（黑卡）",
+"issuer": "Standard Chartered",
+"type": "miles",
+"net": "Mastercard"
+},
+{
+"id": "sc_cathay",
+"name": "渣打國泰（綠卡）",
+"issuer": "Standard Chartered",
+"type": "miles",
+"net": "Mastercard"
+},
+{
+"id": "za_card",
+"name": "ZA Card",
+"issuer": "ZA Bank",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "za_credit",
+"name": "ZA Credit",
+"issuer": "ZA Bank",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "sim_card",
+"name": "sim Credit Card（黃卡）",
+"issuer": "sim",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "sim_world",
+"name": "sim World MC（紫卡）",
+"issuer": "sim",
+"type": "cashback",
+"net": "Mastercard"
+},
+{
+"id": "ds_earnmore",
+"name": "安信 EarnMORE",
+"issuer": "安信",
+"type": "cashback",
+"net": "銀聯"
+},
+{
+"id": "ds_wewa_vs",
+"name": "安信 WeWa Visa Sig",
+"issuer": "安信",
+"type": "cashback",
+"net": "Visa"
+},
+{
+"id": "ds_wewa_up",
+"name": "安信 WeWa 銀聯卡",
+"issuer": "安信",
+"type": "cashback",
+"net": "銀聯"
+}
+]

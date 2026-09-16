@@ -1,0 +1,23 @@
+data/
+.cache/
+out/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+config.json
+# local-only private notes (never publish)
+private/
+# user files the README tells you to keep next to the tools (SwipeWhich's rule library, real exports, backups)
+/app-data.json
+/*.csv
+/backup*.json
+/swipewhich-backup*.json
+/transfer_code*.txt
+# the same user files wherever they end up (a custom --out directory, a sub-folder, a renamed backup)
+review.csv
+swipewhich-backup*.json
+transfer_code*.txt
+app-data.json
+transaction_export_*.csv
+account_export_*.csv
