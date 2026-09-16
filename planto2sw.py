@@ -475,7 +475,7 @@ class Converter:
         # ④ other foreign currency
         if cur != "HKD":
             online = any(k in text for k in self.cfg.get("online_hints", []))
-            return ("onlineFX" if online else self.cfg.get("fx_default", "onlineFX")), f"4:fx({cur})"
+            return ("onlineFX" if online else self.cfg.get("fx_default", "physicalFX")), f"4:fx({cur})"
         # ⑤ payment-method prefix (HKD only)
         for pat, sc in self.cfg.get("prefix_rules", {}).items():
             if re.match(pat, r["_desc"], re.I):

@@ -759,7 +759,7 @@ $("#generate").onclick=async()=>{
 $("#copyCode").onclick=async()=>{ try{await navigator.clipboard.writeText(S.outCode);$("#genMsg").innerHTML='<div class="msg ok">已複製轉移碼。</div>';}catch{ $("#code").select(); document.execCommand("copy"); } };
 function dl(name,content,type){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([content],{type})); a.download=name; a.click(); }
 $("#dlJson").onclick=()=>dl(`swipewhich-backup-${new Date().toISOString().slice(0,10)}.json`,S.outText,"application/json");
-$("#dlReview").onclick=()=>{ const h=["row","date","account","cardId","desc","amount","cur","hkd","status","scenario","layer","include"]; const csv="\uFEFF"+[h.join(",")].concat(S.rows.map(r=>h.map(k=>`"${String(r[k]??"").replace(/"/g,'""')}"`).join(","))).join("\n"); dl("review.csv",csv,"text/csv"); };
+$("#dlReview").onclick=()=>{ const h=["row","date","account","cardId","desc","amount","cur","hkd","status","scenario","layer","include"], f={account:"acct",amount:"amt"}; /* CSV label -> row field */ const csv="\uFEFF"+[h.join(",")].concat(S.rows.map(r=>h.map(k=>`"${String(r[f[k]||k]??"").replace(/"/g,'""')}"`).join(","))).join("\n"); dl("review.csv",csv,"text/csv"); };
 
 // init
 { const a=$("#appdataLink"); a.href=APP_DATA_URL; a.textContent=APP_DATA_URL; }   // link only; the URL is fetched solely when the user clicks 一鍵攞最新
